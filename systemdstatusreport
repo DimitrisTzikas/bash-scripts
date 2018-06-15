@@ -1,0 +1,72 @@
+#!/bin/bash
+
+###########################################################
+#
+# Systemd Status Report
+#
+# Written by Dimitri Tzika
+#
+# Synopsis: systemdstatusreport MODE
+#
+# Arguments: NONE, favorite, all, enabled, disabled
+# NONE and favorite: show status of favorite services
+# all: show status of all services
+# enabled: show enabled services
+# disabled: show disabled services
+# static: show static services
+#
+# Examples:
+# systemdstatusreport
+# systemdstatusreport enabled
+#
+###########################################################
+
+# "Favorite" services
+servicesToCheck='sshd vsftpd netdata'
+
+{
+   
+# First message
+if [[ "$#" -eq 0 || "$1" == "favorite" ]]; then
+    echo "Favorite services"
+elif [[ "$1" == "all" ]]; then
+    echo "All services"
+elif [[ "$1" == "enabled" ]]; then
+    echo "Enabled services:"
+elif [[ "$1" == "disabled" ]]; then
+    echo "Disabled services:"
+elif [[ "$1" == "static" ]]; then
+    echo "Static services:"
+# Error
+else
+    # Error output for less
+    echo "Not valid argument or too many arguments"
+    # Error output
+    echo "Not valid argument or too many arguments" 1>&2
+    exit 1
+fi
+
+# Systemd enabled services
+systemctl list-unit-files | egrep 'service' | sed 's/.service//' | sed 's/@//' | tr -s ' ' | while read service; do
+    serviceName="$(echo $service | cut -d ' ' -f 1)"
+    serviceStatus="$(echo $service | cut -d ' ' -f 2)"
+    # Show favorite services
+    if [[ ("$#" -eq 0 || "$1" == "favorite") && "$servicesToCheck" =~ "$serviceName" ]]; then
+	printf "$serviceName $serviceStatus\n"
+    # Show all services
+    elif [[ "$1" == "all" ]]; then
+	printf "$serviceName $serviceStatus\n"
+    # Show enabled services
+    elif [[ "$1" == "enabled" && "$serviceStatus" == "enabled" ]]; then
+	printf "$serviceName\n"
+    # Show disabled services
+    elif [[ "$1" == "disabled" && "$serviceStatus" == "disabled" ]]; then
+	printf "$serviceName\n"
+    # Show static services
+    elif [[ "$1" == "static" && "$serviceStatus" == "static" ]]; then
+	printf "$serviceName\n"
+    fi
+# Align output and add tab
+done  | column -t | sed 's/^/\t/'
+
+} | less 2>/dev/null
