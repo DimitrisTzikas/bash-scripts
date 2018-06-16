@@ -1,0 +1,215 @@
+#!/bin/bash
+
+#Todo
+# To pote na kimithi to pc i na min kimithi
+
+###########################################################
+#
+# Simple Alarm
+#
+# Written by Dimitri Tzika
+#
+# Synopsis: wakeup
+#
+# Arguments:
+#
+# Examples:
+# wakeup
+#
+###########################################################
+
+# Variables for custom options
+time=0
+music=""
+musicWithCmus=""
+light=""
+
+# Clean screen
+clear
+
+# Functions
+waitDots(){
+    for count in {1..4}; do
+	sleep 1
+	printf "."
+    done
+    clear
+}
+
+# Alarm
+startAlarm(){
+    # Check if light is empty and if it is give default value from the file
+    if [[ "$light" == "" ]]; then
+	egrep 'Light: on' $HOME/.wakeup > /dev/null && light="on" || light=off
+    fi
+
+    # Check if musicWithCmus and music are empty and if they are give the default value from the file
+    if [[ "$musicWithCmus" == "" && "$music" == "" ]]; then
+	music="$(egrep 'MusicAction' $HOME/.wakeup | cut -d ':' -f 2)"
+    # Check if musicWithCmus is enabled and if it is set the value to the music
+    elif [[ "$musicWithCmus" -eq 1 ]]; then
+	music="cmus"
+    fi
+
+    # Check if time is not set and if it is give the default value from the file
+    if [[ "$time" -eq 0 ]]; then
+	time="$(egrep 'TimeToWakeup' $HOME/.wakeup | cut -d ' ' -f 2)"
+    fi
+
+    # Check if specified time is today or tomorrow
+    desiredTime=$((`date +%s -d "$time"`))
+    currentTime=$((`date +%s`))
+    [[ "$desiredTime" -lt "$currentTime" ]] && desiredTime=$((`date +%s -d "$time"` + 86400))
+
+    # Set RTC wakeup time
+    #sudo rtcwake -m no -t "$desiredTime"
+
+    # Wait to execute
+    #sleep $((`desiredTime` - `currentTime` + 30)) && {
+    #}
+
+    # Temp
+    echo $(("$desiredTime" - "$currentTime" + 30))
+
+    # old
+    # If M flag exists play music from cmus and increase volume from 20%
+    if [ $# -eq 2 ] && [ $2 == M ]; then
+	pactl set-sink-volume 0 30%
+	cmus-remote -u
+	# Increase the volume
+	sleep 10
+	for i in {0..18}
+	do
+	    pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +2%
+	    sleep 5
+	done
+    fi
+
+    # For the future
+    # systemctl suspend
+
+}
+
+#######################################################################################
+# Use default settings
+if [[ "$#" -eq 0 ]]; then
+    # Check if file exists
+    if [[ -s "$HOME/.wakeup" ]]; then
+	startAlarm && exit
+    else
+	echo "No file found." 2>&1
+	exit 1
+    fi
+    
+#######################################################################################
+# Settings menu
+elif [[ "$#" -eq 1 && "$1" == [sS][eE][tT][tT][iI][nN][gG][sS] || "$1" == [sS] ]]; then
+    # Create settings file
+    if [[ ! -s "$HOME/.wakeup" ]]; then
+	printf "# This file contains settings for the wakeup command\nTimeToWakeup: 00:00\nMusicAction: cmus\nLight: on\n" > $HOME/.wakeup
+    fi
+    doNotExit=1
+    while [[ "$doNotExit" -eq 1 ]]; do
+	clear
+	printf "Settings Menu\n\t|0.Exit|\n\t|1.Change default time|\n\t|2.Change default music action|\n\t|3.Control lights|\n\t|4.See Settings|\n"
+	echo -n "Select an option: "
+	read userOption
+	case "$userOption" in
+	    0 | [qQ]) clear
+		      exit;;
+	    1) clear
+	       # Check if time is valid
+	       printf "Set time(HH:MM): "
+	       read given
+	       until date -d "$given" > /dev/null 2>&1 && [[ "$given" == ??:?? ]]; do
+		   printf "Not valid time" 1>&2
+		   waitDots
+		   printf "Set time(HH:MM): "
+		   read given
+	       done
+	       # Save changed time to file
+	       sed -i -r "s/[0-9]{2}:[0-9]{2}/$given/" $HOME/.wakeup;;
+	    2) clear
+	       printf "Select an option\n\t|1.Cmus|\n\t|2.Custom command|\nSelect an option: "
+	       read given
+	       case "$given" in
+		   # Save changed music action to file
+		   1) sed -i -r "s/MusicAction: .*/MusicAction: cmus/" $HOME/.wakeup;;
+		   2) given="n"
+		      while [[ "$given" != [yY] && "$given" != [yY][eE][sS] ]]; do
+			  clear
+			  printf "Enter the custom command: "
+			  read customCommand
+			  printf "Are you sure?(y/n) "
+			  read given
+		      done
+		      # Save changed music action to file
+		      sed -i -r "s/MusicAction: .*/MusicAction: $customCommand/" $HOME/.wakeup;;
+		   *) printf "Not valid option"
+		      waitDots;;
+	       esac;;
+	    3)clear
+	      # Check if argument is valid
+	       printf "Set Light control(on/off): "
+	       read given
+	       while [[ "$given" != "on" && "$given" != "off" ]]; do
+		   printf "Not valid argument" 1>&2
+		   waitDots
+		   printf "Set Light control(on/off): "
+		   read given
+	       done
+	       # Save changed option to file
+	       sed -i -r "s/Light: [a-z]{2,3}/Light: $given/" $HOME/.wakeup;;
+	    4) clear
+	       # Show settings
+	       cat $HOME/.wakeup | tail -3
+	       echo "To go back press <enter>"
+	       read;;
+	    *) printf "Not valid option" 1>&2
+	       waitDots;;
+	esac
+    done
+    
+#######################################################################################
+# Errors
+elif [[ "$#" -ge 4 ]]; then
+    echo "error too many arguments" 1>&2
+    exit 1
+    
+#######################################################################################
+# Change default action for one run
+else
+    # Set off
+    music=0
+    musicWithCmus=0
+    light="off"
+    # Iterate over arguments
+    for argument in "$@"; do
+	case "$argument" in
+	    # Check if time is correct
+	    *:*) if date -d "$argument" > /dev/null 2>&1 && [[ "$argument" == ??:?? ]]; then
+		     time="$arguments"
+		 else
+		     echo "Not valid time" 1>&2
+		     exit 1
+		 fi;;
+	    # Music settings option
+	    [mM]) music=1;;
+	    # Play music with cmus option
+	    [mM][cC]) musicWithCmus=1;;
+	    # Light turn on option
+	    [lL]) light="on";;
+	    *) echo "Not valid option." 1>&2
+	       exit 1;;
+	esac
+    done
+    # Check for conflicted options
+    if [[ "$music" -eq 1 && "$musicWithCmus" -eq 1 ]]; then
+	printf "Conflicted options:\n\tYou can't have Music and Music with cmus enabled\n" 1>&2
+	exit 1
+    fi
+fi
+
+#######################################################################################
+# Start Alarm without only the default actions 
+startAlarm
