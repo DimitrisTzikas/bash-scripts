@@ -1,0 +1,34 @@
+#!/bin/bash
+
+###########################################################
+#
+# Smart Desk Control
+#
+# Written by Dimitri Tzika
+#
+# Synopsis: desk ARGUMENT
+#
+# Arguments: backLight, monitor, light
+# backLight: toggle backLight
+# monitor: toggle monitor
+# light: toggle light
+#
+# Examples:
+# desk light
+# desk monitor
+# desk l
+# desk bl
+#
+###########################################################
+
+if [[ "$#" -ne 1 ]]; then
+    echo "" 1>&2
+    exit 1
+else
+    case "$1" in
+	[bB][lL] | [bB][aA][cC][kK][lL][iI][gG][hH][tT]) (curl 192.168.123.200 | egrep '?comRelay1=on' > /dev/null && curl 192.168.123.200/?comRelay1=on || curl 192.168.123.200/?comRelay1=off) >/dev/null 2>/dev/null;;
+	[mM] | [mM][oO][nN][iI][tT][oO][rR]) (curl 192.168.123.200 | egrep '?comRelay2=on' > /dev/null && curl 192.168.123.200/?comRelay2=on || curl 192.168.123.200/?comRelay2=off) >/dev/null 2>/dev/null;;
+	[lL] | [lL][iI][gG][hH][tT]) (curl 192.168.123.200 | egrep '?comRelay3=on' > /dev/null && curl 192.168.123.200/?comRelay3=on || curl 192.168.123.200/?comRelay3=off) >/dev/null 2>/dev/null;;
+	*) echo "error"
+    esac
+fi
