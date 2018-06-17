@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#Todo
-# To pote na kimithi to pc i na min kimithi
-
 ###########################################################
 #
 # Simple Alarm
@@ -38,56 +35,68 @@ waitDots(){
 
 # Alarm
 startAlarm(){
-    # Check if light is empty and if it is give default value from the file
+    # Check if light control is empty and if it is give default value from the file
     if [[ "$light" == "" ]]; then
-	egrep 'Light: on' $HOME/.wakeup > /dev/null && light="on" || light=off
+	egrep 'Light: on' $HOME/.wakeup > /dev/null && light="on" || light="off"
     fi
 
     # Check if musicWithCmus and music are empty and if they are give the default value from the file
     if [[ "$musicWithCmus" == "" && "$music" == "" ]]; then
-	music="$(egrep 'MusicAction' $HOME/.wakeup | cut -d ':' -f 2)"
+	music="$(egrep 'MusicAction' $HOME/.wakeup | cut -d ':' -f 2 | tr -d ' ')"
     # Check if musicWithCmus is enabled and if it is set the value to the music
     elif [[ "$musicWithCmus" -eq 1 ]]; then
 	music="cmus"
+    else
+	# ask for custom commad
+	echo k
     fi
 
     # Check if time is not set and if it is give the default value from the file
-    if [[ "$time" -eq 0 ]]; then
+    if [[ "$time" == "0" ]]; then
 	time="$(egrep 'TimeToWakeup' $HOME/.wakeup | cut -d ' ' -f 2)"
     fi
 
     # Check if specified time is today or tomorrow
-    desiredTime=$((`date +%s -d "$time"`))
-    currentTime=$((`date +%s`))
-    [[ "$desiredTime" -lt "$currentTime" ]] && desiredTime=$((`date +%s -d "$time"` + 86400))
+    desiredTime=$(date +%s -d "$time")
+    [[ `date +%s` -gt "$desiredTime" ]] && desiredTime=$((desiredTime+= 86400))
 
     # Set RTC wakeup time
-    #sudo rtcwake -m no -t "$desiredTime"
+    printf "Wakeup set at: "
+    sudo rtcwake -m no -t "$((desiredTime+=10800))" | cut -d ' ' -f 6-10 | tr -d '\n'
+    waitDots
 
     # Wait to execute
-    #sleep $((`desiredTime` - `currentTime` + 30)) && {
-    #}
+    {
+	sleep 5
+	systemctl suspend && sleep 10
 
-    # Temp
-    echo $(("$desiredTime" - "$currentTime" + 30))
+	# Check if light control is enabled
+	if [[ "$light" == "on" ]]; then
+	    sleep 15 && curl 192.168.123.200/?comRelay1=off
+	    sleep 5 && curl 192.168.123.200/?comRelay2=off
+	    sleep 60 && curl 192.168.123.200/?comRelay3=off
+	fi 2> /dev/null &
 
-    # old
-    # If M flag exists play music from cmus and increase volume from 20%
-    if [ $# -eq 2 ] && [ $2 == M ]; then
-	pactl set-sink-volume 0 30%
-	cmus-remote -u
-	# Increase the volume
-	sleep 10
-	for i in {0..18}
-	do
-	    pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +2%
-	    sleep 5
-	done
-    fi
+	# Check if music is enabled
+	if [[ "$music" != "0" ]]; then
+	    sleep 10
+	    # Set volume to 15%
+	    pactl set-sink-volume 0 15%
+	    # Check what to use, cmus or custom command
+	    if [[ "$music" == "cmus" ]]; then
+		cmus-remote -u
+	    else
+		$music &
+	    fi
+	    # Increase volume
+	    for i in {0..20}; do
+		pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +1%
+		sleep 8
+	    done
+	fi &
 
-    # For the future
-    # systemctl suspend
-
+    } > /dev/null &
+    disown -h %1
 }
 
 #######################################################################################
@@ -188,7 +197,7 @@ else
 	case "$argument" in
 	    # Check if time is correct
 	    *:*) if date -d "$argument" > /dev/null 2>&1 && [[ "$argument" == ??:?? ]]; then
-		     time="$arguments"
+		     time="$argument"
 		 else
 		     echo "Not valid time" 1>&2
 		     exit 1
