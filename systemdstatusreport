@@ -22,7 +22,7 @@
 ###########################################################
 
 # "Favorite" services
-servicesToCheck='sshd vsftpd netdata'
+servicesToCheck='sshd vsftpd netdata NetworkManager'
 
 {
    
