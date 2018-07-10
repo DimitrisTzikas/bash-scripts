@@ -62,13 +62,16 @@ startAlarm(){
 
     # Set RTC wakeup time
     printf "Wakeup set at: "
-    sudo rtcwake -m no -t "$((desiredTime+=10800))" | cut -d ' ' -f 6-10 | tr -d '\n'
+    sudo rtcwake -m no -t "$desiredTime" | cut -d ' ' -f 6-10 | tr -d '\n'
     waitDots
 
-    # Wait to execute
+    # Execute after suspend
     {
 	sleep 5
 	systemctl suspend && sleep 10
+
+	# Kill alarm actions
+	termite -e "bash -c \"echo 'Press <enter> to stop the alarm' && read && pkill wakeup\"" > /dev/null 2 > /dev/null &
 
 	# Check if light control is enabled
 	if [[ "$light" == "on" ]]; then
@@ -90,10 +93,10 @@ startAlarm(){
 	    fi
 	    # Increase volume
 	    for i in {0..20}; do
-		pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +1%
 		sleep 8
+		pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +1%
 	    done
-	fi &
+	fi
 
     } > /dev/null &
     disown -h %1
