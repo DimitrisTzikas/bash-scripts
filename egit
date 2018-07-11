@@ -6,7 +6,7 @@
 # 
 # Written by Dimitri Tzikas
 #
-# Synopsis: egit OPTIONS
+# Synopsis: egit OPTION
 # add: push a file or files to master
 #
 # Options: add

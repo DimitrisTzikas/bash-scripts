@@ -6,9 +6,9 @@
 #
 # Written by Dimitri Tzika
 #
-# Synopsis: desk ARGUMENT
+# Synopsis: desk OPTION
 #
-# Arguments: backLight, monitor, light
+# OPTIONS: backLight, monitor, light
 # backLight: toggle backLight
 # monitor: toggle monitor
 # light: toggle light
