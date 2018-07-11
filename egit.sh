@@ -15,13 +15,17 @@
 #
 ###########################################################
 
-# Check arguments
 break="============================================================"
+
+# Check arguments
 case "$1" in
+    # Add and push files
     add) clear
          echo "$break"
-         # Add file
-         git add "$2"
+         # Add files
+         for files in "$@"; do
+            git add "$files"
+         done
 
          # Commit
          git commit -m "$( date +%m-%d-%Y)"
