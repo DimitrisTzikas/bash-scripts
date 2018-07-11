@@ -41,5 +41,4 @@ case "$1" in
 
     *) echo "Not valid option." 1>&2
        exit 1;;
-    esac
-fi
+esac
