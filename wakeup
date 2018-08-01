@@ -94,7 +94,7 @@ startAlarm(){
 	    # Increase volume
 	    for i in {0..20}; do
 		sleep 8
-		pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +1%
+		pactl set-sink-mute $(pactl info | grep 'Default Sink: ' | cut -d' ' -f3) false ; pactl set-sink-volume $(pactl info | grep 'Default Sink: ' | cut -d' ' -f3) +1%
 	    done
 	fi
 

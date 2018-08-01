@@ -1,0 +1,64 @@
+#!/bin/bash
+
+###########################################################
+#
+# IP Tables Script
+#
+# Written by Dimitri Tzika
+#
+# Synopsis: firewall MODE
+#
+# Modes: off, on, panic, ninja
+# off: Accept all
+# on: Accept only output and established
+# panic: Accept none
+#
+# Examples:
+# firewall on
+# firewall
+#
+###########################################################
+
+# Check for root user
+if [[ $(whoami) == "root" ]]; then
+    case $# in
+	0) count=$(iptables -L | grep DROP | wc -l)
+	   if [[ $count -eq 1 ]]; then
+	       echo "Firewall: off"
+	   elif [[ $count -eq 2 ]]; then
+	       echo "Firewall: on"
+	   else
+	       echo "Firewall: panic"
+	   fi;;
+	1) case $1 in
+	       # ACCEPT ALL
+	       off) IPT=/sbin/iptables
+		    $IPT -F
+		    #Policies
+		    $IPT -P OUTPUT ACCEPT
+		    $IPT -P INPUT ACCEPT
+		    $IPT -P FORWARD DROP;;
+	   
+	       # ACCEPT ONLY OUTPUT AND ESTABLISHED
+	       on) IPT=/sbin/iptables
+		   $IPT -F
+		   #Policies
+		   $IPT -P OUTPUT ACCEPT
+		   $IPT -P INPUT DROP
+		   $IPT -P FORWARD DROP
+		   #Allow Responses
+		   $IPT -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT;;
+	       
+	       # ACCEPT NONE
+	       panic) IPT=/sbin/iptables
+		      #Policies
+		      $IPT -P OUTPUT DROP
+		      $IPT -P INPUT DROP
+		      $IPT -P FORWARD DROP;;
+	       *) echo "Modes: off, on, panic" 1>&2; exit 1;;
+	   esac;;
+	*) echo "Usage: firewall MODE" 1>&2; exit 1;;
+    esac
+else
+    echo "firewall needs root privileges" 1>&2; exit 1
+fi
