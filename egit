@@ -4,12 +4,12 @@
 #
 # Easy git
 # 
-# Written by Dimitri Tzikas
+# Written by Dimitri Tzika
 #
 # Synopsis: egit OPTION
-# add: push a file or files to master
 #
 # Options: add
+# add: push a file or files to master
 #
 # Examples:
 # egit add *

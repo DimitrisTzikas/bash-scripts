@@ -1,0 +1,26 @@
+#!/bin/bash
+
+###########################################################
+#
+# Easy unmount for luksFormat
+#
+# Written by Dimitri Tzika
+#
+# Take a device and a folder as its arguments
+# Examples:
+# umountdisk sdb1 /mnt
+# umountdisk sda2 /home/user
+#
+###########################################################
+
+# Check for root user
+if [[ $(whoami) == "root" ]]; then
+    # Unmount a luksFormat device
+    case $# in
+	0) ls /dev/mapper/;;
+	2) umount "$2"; cryptsetup luksClose "$1";;
+	*) echo "Usage: umountdisk DEVICE FOLDER" 1>&2; exit 1;;
+    esac
+else
+    echo "umountdisk needs root privilages" 1>&2; exit 1
+fi

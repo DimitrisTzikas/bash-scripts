@@ -1,0 +1,27 @@
+#!/bin/bash
+
+###########################################################
+#
+# Easy mount for luksFormat
+#
+# Written by Dimitri Tzika
+#
+# Take a device, a device name and a folder as its arguments
+# Examples:
+# mountdisk sdb1 usb /mnt
+# mountdisk sda2 home /home/user
+#
+###########################################################
+
+# Check for root user
+if [[ $(whoami) == "root" ]]; then
+    # Open and mount a luksFormat device
+    case $# in
+	0) fdisk -l;;
+	3) cryptsetup open /dev/"$1" "$2"; mount /dev/mapper/"$2" "$3";;
+	*) echo "Usage: mountdisk DEVICE DIVICE_NAME FOLDER" 1>&2; exit 1;;
+    esac
+else
+    echo "mountdisk needs root privilages" 1>&2; exit 1
+fi
+
