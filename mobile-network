@@ -1,0 +1,17 @@
+#!/bin/bash
+
+###########################################################
+#
+# Mobile Network
+#
+# Written by Dimitri Tzika
+#
+# Synopsis: mobile-network
+#
+###########################################################
+
+if [[ $(whoami) == "root" ]]; then
+    usb_modeswitch -v 12d1 -p 1f1c -W -M 55534243123456780000000000000011062000000101000100000000000000
+else
+    echo "mobile-network needs root privileges" 1>&2; exit 1
+fi
