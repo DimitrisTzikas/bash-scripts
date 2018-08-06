@@ -24,10 +24,10 @@ chosen="$(echo "$drives" | dmenu -b -i -p "Mount: Which drive?" | cut -d' ' -f1 
 sleep 1
 
 #Check if the drive is encrypted
-if blkid | grep "$chosen.*crypto_LUKS"; then
+if sudo -A blkid | grep "$chosen.*crypto_LUKS"; then
     ddn="$(echo | dmenu -b -p "Give a name:")"
     [ -z "$ddn" ] && exit 1
-    xterm -e "sudo cryptsetup open $chosen $ddn"
+    xterm -e "sudo -A cryptsetup open $chosen $ddn"
     chosen="/dev/mapper/$ddn"
 fi
 
@@ -35,7 +35,7 @@ fi
 sudo -A mount "$chosen" && exit 0
 
 #Select where to mount
-mp="$(find /mnt /run/media -maxdepth 2 -type d 2>/dev/null | dmenu -b -i -p "Where to mount?")"
+mp="$(find /mnt /run/media ~/ -maxdepth 2 -type d 2>/dev/null | dmenu -b -i -p "Where to mount?")"
 [ -z "$mp" ] && exit 1
 
 #Wait for dmenu to close
