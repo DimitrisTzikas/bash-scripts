@@ -15,24 +15,27 @@
 #
 ###########################################################
 
+# Stop music
+(pgrep cmus && cmus-remote -s || (pgrep mocp && mocp -s || (pgrep spotify && dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause))) &
+
 # Play lock sound
-(sleep 1.1 && mplayer $HOME/.sounds/lock.wav) &
+(sleep 1.1 && mplayer "$HOME/.sounds/lock.wav") &
 
 # Us keyboard layout and swap caps lock with escape
 setxkbmap us && xmodmap -e 'clear Lock' && xmodmap -e 'keycode 0x42=Escape' && xmodmap -e 'keycode 0x9=Caps_Lock'
 
 # Pixelate background
-ICON=$HOME/Pictures/Wallpapers/icon.png
+ICON="$HOME/Pictures/Wallpapers/icon.png"
 TMPBG=/tmp/screen.png
-scrot $TMPBG
-convert $TMPBG -scale 10% -scale 1000% $TMPBG
-convert $TMPBG $ICON -gravity center -composite -matte $TMPBG
-i3lock -u -i $TMPBG
-rm $TMPBG
+scrot "$TMPBG"
+convert "$TMPBG" -scale 10% -scale 1000% "$TMPBG"
+convert "$TMPBG" "$ICON" -gravity center -composite -matte "$TMPBG"
+i3lock -u -i "$TMPBG"
+rm "$TMPBG"
 
 # Play unlock sound
 # Disaster!
-while ps cax | egrep 'i3lock'; do
-    sleep .5;
+while pgrep 'i3lock'; do
+    sleep .5
 done
-mplayer $HOME/.sounds/unlock.wav
+mplayer "$HOME/.sounds/unlock.wav"
