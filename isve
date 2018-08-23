@@ -23,22 +23,22 @@
 # Check for root user
 if [[ $(whoami) == "root" ]]; then
     case $# in
-	0) printf "Interfaces:\n$(ifconfig | egrep '^.{3}[^ ]*:' | cut -d: -f1)";;
+	0) printf "Interfaces:\n%s" "$(ifconfig | grep -e '^.{3}[^ ]*:' | cut -d: -f1)";;
 	1) case "$1" in
 	       off) ip link set down dev enp0s25
 		    sysctl net.ipv4.ip_forward=0
 		    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j DROP
 		    iptables -A FORWARD -i enp0s25 -o wlp3s0 -j DROP;;
-	       *) if [[ "$(ifconfig | egrep '^.{3}[^ ]*:' | cut -d: -f1 | tr '\n' ' ')" = *" $1 "* ]]; then
+	       *) if [[ "$(ifconfig | grep -e '^.{3}[^ ]*:' | cut -d: -f1 | tr '\n' ' ')" = *" $1 "* ]]; then
 		      ip link set up dev enp0s25
 		      ip addr add 192.168.123.1/24 dev enp0s25 # arbitrary address
 		      sysctl net.ipv4.ip_forward=1
 		      iptables -t nat -A POSTROUTING -o "$1" -j MASQUERADE
 		      iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-		      iptables -A FORWARD -i enp0s25 -o "$1" -j ACCEPT;;
+		      iptables -A FORWARD -i enp0s25 -o "$1" -j ACCEPT
 		  else
 		      echo "No valid interface" 1>&2; exit 1
-		  fi
+		  fi;;
 	   esac;;
 	*) echo "Usage: isve INTERFACE || MODE" 1>&2; exit 1;;
     esac

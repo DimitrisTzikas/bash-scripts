@@ -36,7 +36,7 @@ case "$1" in
          git push -u origin master
 
          # Whait the user and clean the console
-         read -p "Press <enter> to continue."
+         read -pr "Press <enter> to continue."
          clear;;
 
     *) echo "Not valid option." 1>&2

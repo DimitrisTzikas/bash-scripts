@@ -47,24 +47,24 @@ else
 fi
 
 # Systemd enabled services
-systemctl list-unit-files | egrep 'service' | sed 's/.service//' | sed 's/@//' | tr -s ' ' | while read service; do
-    serviceName="$(echo $service | cut -d ' ' -f 1)"
-    serviceStatus="$(echo $service | cut -d ' ' -f 2)"
+systemctl list-unit-files | grep -e 'service' | sed 's/.service//' | sed 's/@//' | tr -s ' ' | while read -r service; do
+    serviceName="$(echo "$service" | cut -d ' ' -f 1)"
+    serviceStatus="$(echo "$service" | cut -d ' ' -f 2)"
     # Show favorite services
-    if [[ ("$#" -eq 0 || "$1" == "favorite") && "$servicesToCheck" =~ "$serviceName" ]]; then
-	printf "$serviceName $serviceStatus\n"
+    if [[ ("$#" -eq 0 || "$1" == "favorite") && "$servicesToCheck" =~ $serviceName ]]; then
+	printf "%s %s\n" "$serviceName" "$serviceStatus"
     # Show all services
     elif [[ "$1" == "all" ]]; then
-	printf "$serviceName $serviceStatus\n"
+	printf "%s %s\n" "$serviceName" "$serviceStatus"
     # Show enabled services
     elif [[ "$1" == "enabled" && "$serviceStatus" == "enabled" ]]; then
-	printf "$serviceName\n"
+	printf "%s\n" "$serviceName"
     # Show disabled services
     elif [[ "$1" == "disabled" && "$serviceStatus" == "disabled" ]]; then
-	printf "$serviceName\n"
+	printf "%s\n" "$serviceName"
     # Show static services
     elif [[ "$1" == "static" && "$serviceStatus" == "static" ]]; then
-	printf "$serviceName\n"
+	printf "%s\n" "$serviceName"
     fi
 # Align output and add tab
 done  | column -t | sed 's/^/\t/'

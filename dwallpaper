@@ -43,4 +43,3 @@ else
     pic=16
 fi
 DISPLAY=:0 feh --bg-scale "/home/dimitris/Pictures/Wallpapers/DynamicWallpapers/$pic.jpg"
-

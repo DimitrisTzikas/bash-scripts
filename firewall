@@ -22,7 +22,7 @@
 # Check for root user
 if [[ $(whoami) == "root" ]]; then
     case $# in
-	0) count=$(iptables -L | grep DROP | wc -l)
+	0) count=$(iptables -L | grep -c DROP)
 	   if [[ $count -eq 1 ]]; then
 	       echo "Firewall: off"
 	   elif [[ $count -eq 2 ]]; then
