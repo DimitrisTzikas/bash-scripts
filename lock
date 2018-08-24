@@ -15,9 +15,6 @@
 #
 ###########################################################
 
-# Stop music
-(pgrep cmus && cmus-remote -s || (pgrep mocp && mocp -s || (pgrep spotify && dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause))) &
-
 # Play lock sound
 (sleep 1.1 && mplayer "$HOME/.sounds/lock.wav") &
 
