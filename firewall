@@ -8,7 +8,7 @@
 #
 # Synopsis: firewall MODE
 #
-# Modes: off, on, panic, ninja
+# Modes: off, on, panic
 # off: Accept all
 # on: Accept only output and established
 # panic: Accept none
