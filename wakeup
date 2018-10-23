@@ -67,37 +67,37 @@ startAlarm(){
 
     # Execute after suspend
     {
-	sleep 5
-	systemctl suspend && sleep 10
+		sleep 5
+		systemctl suspend && sleep 10
 
-	# Kill alarm actions
-	termite -e "bash -c \"echo 'Press <enter> to stop the alarm' && read -r && pkill wakeup\"" > /dev/null 2 > /dev/null &
+		# Kill alarm actions
+		termite -e "bash -c \"echo 'Press <enter> to stop the alarm' && read -r && pkill wakeup\"" > /dev/null 2 > /dev/null &
 
-	# Check if light control is enabled
-	if [[ "$light" == "on" ]]; then
-	    sleep 15 && curl 192.168.123.200/?comRelay1=off
+		# Check if light control is enabled
+		if [[ "$light" == "on" ]]; then
+	    sleep 15 && curl 192.168.123.200/?comRelay4=off
 	    sleep 5 && curl 192.168.123.200/?comRelay2=off
 	    sleep 60 && curl 192.168.123.200/?comRelay3=off
-	fi 2> /dev/null &
+		fi 2> /dev/null &
 
-	# Check if music is enabled
-	if [[ "$music" != "0" ]]; then
-	    sleep 10
-	    # Set volume to 15%
-	    pactl set-sink-volume "$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)" 15%
-	    # Check what to use, cmus or custom command
-	    if [[ "$music" == "cmus" ]]; then
-		cmus-remote -u
-	    else
-		$music &
-	    fi
-	    # Increase volume
-	    pactl set-sink-mute "$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)" false
-	    for volume in {16..36}; do
-		sleep 8
-		pactl set-sink-volume "$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)" "$volume"%
-	    done
-	fi
+		# Check if music is enabled
+		if [[ "$music" != "0" ]]; then
+			sleep 5 && curl 192.168.123.200/?comRelay1=off && sleep 5
+	    	# Set volume to 15%
+	    	pactl set-sink-volume "$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)" 15%
+	    	# Check what to use, cmus or custom command
+	    	if [[ "$music" == "cmus" ]]; then
+				cmus-remote -u
+		    else
+				$music &
+	    	fi
+	    	# Increase volume
+	    	pactl set-sink-mute "$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)" false
+	    	for volume in {30..50}; do
+				sleep 8
+				pactl set-sink-volume "$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)" "$volume"%
+	    	done
+		fi
 
     } > /dev/null &
     disown -h %1
