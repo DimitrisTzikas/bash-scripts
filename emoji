@@ -8,4 +8,7 @@
 #
 ###########################################################
 
-grep -v "#" ~/.emojis | dmenu -i -l 15 -fn Monospace-18 | awk '{print $1}' | tr -d '\n' | xclip -selection clipboard
+#Check if dmenu is running
+pgrep -x dmenu && exit 1
+
+grep -v "#" ~/.emojis | dmenu -d -i -p -l 15 -fn Monospace-18 | awk '{print $1}' | tr -d '\n' | xclip -selection clipboard
