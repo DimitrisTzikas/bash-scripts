@@ -27,7 +27,7 @@ sleep 1
 if sudo -A blkid | grep "$chosen.*crypto_LUKS"; then
     ddn="$(echo | dmenu -b -p "Give a name:")"
     [ -z "$ddn" ] && exit 1
-    xterm -e "sudo -A cryptsetup open $chosen $ddn"
+    xterm -background black -foreground white -e "sudo -A cryptsetup open $chosen $ddn"
     chosen="/dev/mapper/$ddn"
 fi
 
