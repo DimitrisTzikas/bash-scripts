@@ -20,7 +20,7 @@ ProtonVPNus1="$HOME/.config/vpn/us-free-01.protonvpn.com.tcp.ovpn"
 ProtonVPNus2="$HOME/.config/vpn/us-free-02.protonvpn.com.tcp.ovpn"
 
 # Check if openvpn is running
-if [[ $(ps cax | grep openvpn ) > /dev/null ]]; then
+if [[ $(pgrep openvpn) > /dev/null ]]; then
     echo "OpenVPN is running" 1>&2; exit 1
 fi
 
