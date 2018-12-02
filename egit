@@ -39,6 +39,6 @@ case "$1" in
          read -pr "Press <enter> to continue."
          clear;;
 
-    *) echo "Not valid option." 1>&2
+    *) echo "Not valid option" 1>&2
        exit 1;;
 esac
