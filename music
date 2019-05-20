@@ -1,7 +1,0 @@
-#!/bin/bash
-
-cmd=(dialog --keep-tite --menu "Select options:" 22 76 16)
-options=(`cat youtube-videos`)
-choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
-mpv $choices 2>&1 >/dev/tty &
-disown %mpv 2>&1 >/dev/tty
