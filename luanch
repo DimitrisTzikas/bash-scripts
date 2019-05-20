@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case $(printf 'Live\nMusic' | dmenu -b -i -sb "#880000" -p "Which option?") in
+    'Live')
+	sleep .2
+	option=$(cut -d ' ' -f2 ~/.live-stream-videos | dmenu -b -i -sb "#880000" -p "Select live stream?")
+	mpv $(grep $option ~/.live-stream-videos | cut -d ' ' -f1) &>/dev/null &;;
+    'Music')
+	sleep .2
+	option=$(cut -d ' ' -f2 ~/.youtube-videos | dmenu -b -i -sb "#880000" -p "Select music video?")
+	mpv $(grep $option ~/.youtube-videos | cut -d ' ' -f1) &>/dev/null &;;
+esac
