@@ -1,6 +1,11 @@
 #!/bin/bash
 
-case $(printf 'Live\nMusic' | dmenu -b -i -sb "#880000" -p "Which option?") in
+#TODO make mpv use hd no full hd or higher
+
+case $(printf 'Edit\nLive\nMusic' | dmenu -b -i -sb "#880000" -p "Which option?") in
+	'Edit')
+	sleep .2
+	file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d | dmenu -b -i -sb "#880000" -p "Select file:"` && (emacs $file & disown emacs);;
     'Live')
 	sleep .2
 	option=$(cut -d ' ' -f2 ~/.live-stream-videos | dmenu -b -i -sb "#880000" -p "Select live stream?")
@@ -8,5 +13,5 @@ case $(printf 'Live\nMusic' | dmenu -b -i -sb "#880000" -p "Which option?") in
     'Music')
 	sleep .2
 	option=$(cut -d ' ' -f2 ~/.youtube-videos | dmenu -b -i -sb "#880000" -p "Select music video?")
-	mpv $(grep $option ~/.youtube-videos | cut -d ' ' -f1) &>/dev/null &;;
+	mpv --ytdl-format=22 $(grep $option ~/.youtube-videos | cut -d ' ' -f1) &>/dev/null &;;
 esac
