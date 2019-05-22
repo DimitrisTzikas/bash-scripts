@@ -1,23 +1,29 @@
 #!/bin/bash
 
-#TODO make mpv use hd no full hd or higher
-
-case $(printf 'Edit\nMode\nMusic\nLive' | dmenu -b -i -sb "#880000" -p "Which option?") in
-	'Edit')
+case $(printf 'Edit (emacs)\nEdit (vscode)\nMode\nMusic\nLive' | dmenu -b -i -sb "#880000" -p "Which option?") in
+	'Edit (emacs)')
 	sleep .2
 	file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d | dmenu -b -i -sb "#880000" -p "Select file:"` && (emacs $file & disown emacs);;
+	'Edit (vscode)')
+	sleep .2
+	file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d | dmenu -b -i -sb "#880000" -p "Select file:"` && com.visualstudio.code $file;;
 	'Mode')
 	sleep .2
 	case $(printf 'Home\nWork' | dmenu -b -i -sb "#880000" -p "Select mode:") in
-	'Home')xrandr --output VGA-1 --primary --right-of LVDS-1 --auto && xrandr --output LVDS-1 --left-of VGA-1 --auto && xmonad --restart;;
-	'Work')xrandr --output VGA-1 --above LVDS-1 --auto && xrandr --output LVDS-1 --primary --below VGA-1 --auto && xmonad --restart;;
+		'Home')
+		notify-send 'Swipe your finger' && sudo ip link set up dev enp0s25 && sudo pkill dhcpcd && sudo dhcpcd && 
+		xrandr --output VGA-1 --primary --right-of LVDS-1 --auto && xrandr --output LVDS-1 --left-of VGA-1 --auto && xmonad --restart
+		sudo firewall onS
+		sudo cp /etc/resolv.conf.example /etc/resolv.conf && sudo chattr +i /etc/resolv.conf;;
+		'Work')
+		xrandr --output VGA-1 --above LVDS-1 --auto && xrandr --output LVDS-1 --primary --below VGA-1 --auto && xmonad --restart;;
 	esac;;
     'Music')
 	sleep .2
 	option=$(cut -d ' ' -f2 ~/.youtube-videos | dmenu -b -i -sb "#880000" -p "Select music video?")
-	mpv --ytdl-format=22 $(grep $option ~/.youtube-videos | cut -d ' ' -f1) &>/dev/null &;;
+	mpv --ytdl-format="bestvideo[ext=mp4][height<=?720]+bestaudio[ext=m4a]" $(grep $option ~/.youtube-videos | cut -d ' ' -f1) &>/dev/null &;;
 	'Live')
 	sleep .2
 	option=$(cut -d ' ' -f2 ~/.live-stream-videos | dmenu -b -i -sb "#880000" -p "Select live stream?")
-	mpv $(grep $option ~/.live-stream-videos | cut -d ' ' -f1) &>/dev/null &;;
+	mpv --ytdl-format="bestvideo[ext=mp4][height<=?720]+bestaudio[ext=m4a]" $(grep $option ~/.live-stream-videos | cut -d ' ' -f1) &>/dev/null &;;
 esac
