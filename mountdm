@@ -17,7 +17,7 @@ drives="$(lsblk -p | pcregrep -Mv 'sd.[1-9].*\n.*crypt' | grep 'part  $' | awk '
 [ -z "$drives" ] && exit 1
 
 #Select drive
-chosen="$(echo "$drives" | dmenu -b -i -sb "#880000" -p "Mount: Which drive?" | cut -d' ' -f1 | tr -d '└─')"
+chosen="$(echo "$drives" | dmenu -b -i -sb "#006677" -p "Mount: Which drive?" | cut -d' ' -f1 | tr -d '└─')"
 [ -z "$chosen" ] && exit 1
 
 #Wait for dmenu to close
@@ -25,7 +25,7 @@ sleep 1
 
 #Check if the drive is encrypted
 if sudo -A blkid | grep "$chosen.*crypto_LUKS"; then
-    ddn="$(echo | dmenu -b -sb "#880000" -p "Give a name:")"
+    ddn="$(echo | dmenu -b -sb "#006677" -p "Give a name:")"
     [ -z "$ddn" ] && exit 1
     xterm -background black -foreground white -e "sudo -A cryptsetup open $chosen $ddn"
     chosen="/dev/mapper/$ddn"
@@ -35,14 +35,14 @@ fi
 sudo -A mount "$chosen" && exit 0
 
 #Select where to mount
-mp="$(find /mnt /run/media ~/ -maxdepth 2 -type d 2>/dev/null | dmenu -b -i -sb "#880000" -p "Where to mount?")"
+mp="$(find /mnt /run/media ~/ -maxdepth 2 -type d 2>/dev/null | dmenu -b -i -sb "#006677" -p "Where to mount?")"
 [ -z "$mp" ] && exit 1
 
 #Wait for dmenu to close
 sleep 1
 
 #If the directory doesn't exist ask to create it
-[ ! -d "$mp" ] && [ "$(printf "No\\nYes" | dmenu -b -i -sb "#880000" -p "$mp does not exist. Create it?")" = "Yes" ] && sudo -A mkdir -p "$mp"
+[ ! -d "$mp" ] && [ "$(printf "No\\nYes" | dmenu -b -i -sb "#006677" -p "$mp does not exist. Create it?")" = "Yes" ] && sudo -A mkdir -p "$mp"
 
 #Mount the drive and send notification
 sudo -A mount "$chosen" "$mp" && pgrep -x dunst && notify-send "$chosen mounted to $mp."
