@@ -9,6 +9,8 @@
 #
 ###########################################################
 
+promptColor="#006677"
+
 #Check if dmenu is running
 pgrep -x dmenu && exit 1
 
@@ -17,7 +19,7 @@ drives="$(lsblk -p | pcregrep -Me 'part.*\n.*crypt|part.{3}' | grep 'part' | awk
 [ -z "$drives" ] && exit
 
 #Select drive
-chosen="$(echo "$drives" | dmenu -b -i -sb "#006677" -p "Unmount: Which drive?" | tr -d '└─' | cut -d' ' -f1)"
+chosen="$(echo "$drives" | dmenu -b -i -sb "$promptColor" -p "Unmount: Which drive?" | tr -d '└─' | cut -d' ' -f1)"
 [ -z "$chosen" ] && exit
 
 #Check if the drive is encrypted
