@@ -1,6 +1,6 @@
 #!/bin/bash
 
-promptColor="#006677"
+promptColor="#007647"
 
 case $(printf 'Edit (emacs)\nEdit (vscode)\nMode\nMusic\nLive' | dmenu -b -i -sb "$promptColor" -p "Which option?") in
 	'Edit (emacs)')

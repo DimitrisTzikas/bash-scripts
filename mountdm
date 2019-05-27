@@ -9,7 +9,7 @@
 #
 ###########################################################
 
-promptColor="#006677"
+promptColor="#007647"
 
 #Check if dmenu is running
 pgrep -x dmenu && exit 1
