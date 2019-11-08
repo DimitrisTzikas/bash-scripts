@@ -16,16 +16,16 @@
 ###########################################################
 
 # Play lock sound
-(sleep 1.1 && mplayer "$HOME/.sounds/lock.wav") &
+(sleep 1.1 && mplayer "$HOME/.sounds/lock2.wav") &
 
 # Us keyboard layout and swap caps lock with escape
 setxkbmap us && xmodmap -e 'clear Lock' && xmodmap -e 'keycode 0x42=Escape' && xmodmap -e 'keycode 0x9=Caps_Lock'
 
 # Pixelate background
-ICON="$HOME/Pictures/Wallpapers/icon.png"
+ICON="$HOME/Pictures/Wallpapers/icon2.png"
 TMPBG=/tmp/screen.png
 scrot "$TMPBG"
 convert "$TMPBG" -scale 10% -scale 1000% "$TMPBG"
 convert "$TMPBG" "$ICON" -gravity center -composite -matte "$TMPBG"
-i3lock -n -u -i "$TMPBG" && mplayer "$HOME/.sounds/unlock.wav"
+i3lock -n -u -i "$TMPBG" && mplayer "$HOME/.sounds/lock2.wav"
 rm "$TMPBG"
