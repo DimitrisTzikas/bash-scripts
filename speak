@@ -1,0 +1,4 @@
+#!/bin/bash
+
+quotes=""
+echo "$quotes" | dmenu -i -sb "$COLOR1" -p "Type a quote:" | festival --tts
