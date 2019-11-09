@@ -23,7 +23,7 @@ chosen="$(echo "$drives" | dmenu -i -sb "$COLOR1" -p "Mount: Which drive?" | cut
 #Wait for dmenu to close
 sleep .2
 
-#Check if the drive is encryptpromptColored
+#Check if the drive is encrypted
 if sudo -A blkid | grep "$chosen.*crypto_LUKS"; then
     ddn="$(echo | dmenu -sb "$COLOR1" -p "Give a name:")"
     [ -z "$ddn" ] && exit 1
