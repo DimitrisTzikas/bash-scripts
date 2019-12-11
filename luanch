@@ -9,19 +9,19 @@ case $(printf 'Control Panel\nEdit\nMode\nVPN' | dmenu -i -sb "$COLOR1" -p "Whic
 		sleep .2
 		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
 			'Enable')rfkill unblock wifi && mplayer $SOUND;;
-			'Disable')notify-send 'Swipe your finger' && sudo pkill wpa_supplicant ; rfkill block wifi && mplayer $SOUND;;
+			'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && mplayer $SOUND;;
 		esac;;
 		'Bluetooth')
 		sleep .2
 		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')notify-send 'Swipe your finger' && sudo systemctl start bluetooth && rfkill unblock bluetooth && mplayer $SOUND;;
-			'Disable')notify-send 'Swipe your finger' && sudo systemctl stop bluetooth && rfkill block bluetooth && mplayer $SOUND;;
+			'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && mplayer $SOUND;;
+			'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && mplayer $SOUND;;
 		esac;;
 		'Ethernet')
 		sleep .2
 		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')notify-send 'Swipe your finger' && sudo ip link set up dev enp0s25 && mplayer $SOUND;;
-			'Disable')notify-send 'Swipe your finger' && sudo ip link set down dev enp0s25 && mplayer $SOUND;;
+			'Enable')sudo ip link set up dev enp0s25 && mplayer $SOUND;;
+			'Disable')sudo ip link set down dev enp0s25 && mplayer $SOUND;;
 		esac;;
 	esac;;
 	'Edit')
