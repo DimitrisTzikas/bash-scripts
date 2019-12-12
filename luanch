@@ -1,27 +1,34 @@
 #!/bin/bash
-SOUND="$HOME/.sounds/lock2.wav"
+notify(){ notify-send -r 1 -u low "$1";}
 
 case $(printf 'Control Panel\nEdit\nMode\nVPN' | dmenu -i -sb "$COLOR1" -p "Which option?") in
 	'Control Panel')
 	sleep .2
-	case $(printf 'Wifi\nBluetooth\nEthernet' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
+	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
 		'Wifi')
 		sleep .2
 		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')rfkill unblock wifi && mplayer $SOUND;;
-			'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && mplayer $SOUND;;
+			'Enable')rfkill unblock wifi && notify "Enabled";;
+			'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && notify "Disabled";;
 		esac;;
 		'Bluetooth')
 		sleep .2
 		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && mplayer $SOUND;;
-			'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && mplayer $SOUND;;
+			'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && notify "Enabled";;
+			'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && notify "Disabled";;
 		esac;;
 		'Ethernet')
 		sleep .2
 		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')sudo ip link set up dev enp0s25 && mplayer $SOUND;;
-			'Disable')sudo ip link set down dev enp0s25 && mplayer $SOUND;;
+			'Enable')sudo ip link set up dev enp0s25 && notify "Enabled";;
+			'Disable')sudo ip link set down dev enp0s25 && notify "Disabled";;
+		esac;;
+		'Resolv')
+		sleep .2
+		case $(printf 'Main\nIHUVPN\nDynamic' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
+			'Main')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
+			'IHUVPN')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.ihuvpn /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
+			'Dynamic')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u && notify "Resolv Changed";;
 		esac;;
 	esac;;
 	'Edit')
@@ -31,7 +38,7 @@ case $(printf 'Control Panel\nEdit\nMode\nVPN' | dmenu -i -sb "$COLOR1" -p "Whic
 	sleep .2
 	case $(printf 'Home\nWork\nMobile' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
 		'Home')
-			notify-send 'Swipe your finger' && sudo ip link set up dev enp0s25 && sudo pkill dhcpcd; sudo dhcpcd; sudo pkill wpa_supplicant
+			notify 'Swipe your finger' && sudo ip link set up dev enp0s25 && sudo pkill dhcpcd; sudo dhcpcd; sudo pkill wpa_supplicant
 			xrandr --output VGA-1 --primary --right-of LVDS-1 --auto && xrandr --output LVDS-1 --left-of VGA-1 --auto && xmonad --restart
 			sudo firewall onS
 			sudo cp /etc/resolv.conf.example /etc/resolv.conf && sudo chattr +i /etc/resolv.conf;;
@@ -40,7 +47,7 @@ case $(printf 'Control Panel\nEdit\nMode\nVPN' | dmenu -i -sb "$COLOR1" -p "Whic
 			sudo firewall onS
 			sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u;;
 		'Mobile')
-			notify-send 'Swipe your finger' && sudo ip link set down dev enp0s25 && sudo pkill dhcpcd
+			notify 'Swipe your finger' && sudo ip link set down dev enp0s25 && sudo pkill dhcpcd
 			xrandr --output VGA-1 --off && xrandr --output LVDS-1 --auto && xmonad --restart
 			sudo firewall onS
 			sudo cp /etc/resolv.conf.example /etc/resolv.conf && sudo chattr +i /etc/resolv.conf;;
