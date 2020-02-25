@@ -1,56 +1,92 @@
 #!/bin/bash
-notify(){ notify-send -r 1 -u low "$1";}
+function notify(){ notify-send -r 1 -u low "$1"; }
 
-case $(printf 'Control Panel\nEdit\nMode\nVPN' | dmenu -i -sb "$COLOR1" -p "Which option?") in
-	'Control Panel')
+function menu(){ printf "$1" | dmenu -i -sb "$COLOR1" -p "$2"; }
+
+function control_panel(){
 	sleep .2
-	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
+	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv\nDNS\nLock\nOverview' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
 		'Wifi')
-		sleep .2
-		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')rfkill unblock wifi && notify "Enabled";;
-			'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && notify "Disabled";;
-		esac;;
+			sleep .2
+			case $(menu 'Enable\nDisable' 'Select mode:') in
+				'Enable')rfkill unblock wifi && notify "Enabled";;
+				'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && notify "Disabled";;
+			esac;;
 		'Bluetooth')
-		sleep .2
-		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && notify "Enabled";;
-			'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && notify "Disabled";;
-		esac;;
+			sleep .2
+			case $(menu 'Enable\nDisable' 'Select mode:') in
+				'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && notify "Enabled";;
+				'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && notify "Disabled";;
+			esac;;
 		'Ethernet')
-		sleep .2
-		case $(printf 'Enable\nDisable' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Enable')sudo ip link set up dev enp0s25 && notify "Enabled";;
-			'Disable')sudo ip link set down dev enp0s25 && notify "Disabled";;
-		esac;;
+			sleep .2
+			case $(menu 'Enable\nDisable' 'Select mode:') in
+				'Enable')sudo ip link set up dev enp0s25 && notify "Enabled";;
+				'Disable')sudo ip link set down dev enp0s25 && notify "Disabled";;
+			esac;;
 		'Resolv')
-		sleep .2
-		case $(printf 'Main\nIHUVPN\nDynamic' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
-			'Main')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
-			'IHUVPN')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.ihuvpn /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
-			'Dynamic')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u && notify "Resolv Changed";;
-		esac;;
-	esac;;
-	'Edit')
+			sleep .2
+			case $(menu 'Main\nIHUVPN\nDynamic' 'Select mode:') in
+				'Main')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
+				'IHUVPN')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.ihuvpn /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
+				'Dynamic')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u && notify "Resolv Changed";;
+			esac;;
+		'DNS')
+			sleep .2
+			case $(menu 'Enable\nDisable' 'Select mode:') in
+				'Enable')notify 'Swipe your finger' && sudo chattr -i /etc/hosts && sudo cp /etc/hosts.backup /etc/hosts && sudo chattr +i /etc/hosts && notify "DNS blocking";;
+				'Disable')notify 'Swipe your finger' && sudo chattr -i /etc/hosts && sudo rm /etc/hosts && sudo touch /etc/hosts && sudo chattr +i /etc/hosts && notify "No DNS blocking";;
+			esac;;
+		'Lock')
+			sleep .2; lock;;
+		'Overview')
+			notify-send -u low "Wifi: $(ifconfig | grep '^wls' > /dev/null && echo enabled || echo disabled)"
+			notify-send -u low "Bluetooth: $(systemctl status bluetooth.service | grep 'running' > /dev/null && echo enabled || echo disabled)"
+			notify-send -u low "Ethernet: $(ifconfig | grep '^enp' > /dev/null && echo enabled || echo disabled)"
+			notify-send -u low "Resolv: $( (head --lines=1 /etc/resolv.conf | grep '^options timeout:1' > /dev/null && echo Main) || (head --lines=1 /etc/resolv.conf | grep '^# Nameservers For TEI VPN' > /dev/null && echo IHU) || echo Dynamic )"		
+			notify-send -u low "DNS blocking: $(head --lines=1 /etc/hosts | grep '# DNS blocking' > /dev/null && echo enabled || echo disabled)"
+	esac
+}
+
+function mode(){
 	sleep .2
-	file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d | dmenu -i -sb "$COLOR1" -p "Select file:"` && (emacs $file & disown emacs);;
-	'Mode')
-	sleep .2
-	case $(printf 'Home\nWork\nMobile' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
+	case $(menu 'Home\nWork\nMobile' 'Select mode:') in
 		'Home')
-			notify 'Swipe your finger' && sudo ip link set up dev enp0s25 && sudo pkill dhcpcd; sudo dhcpcd; sudo pkill wpa_supplicant
+			notify 'Swipe your finger' && sudo firewall onS && sudo ip link set up dev enp0s25 && sudo pkill dhcpcd; sudo dhcpcd; sudo pkill wpa_supplicant
 			xrandr --output VGA-1 --primary --left-of LVDS-1 --auto && xrandr --output LVDS-1 --right-of VGA-1 --auto && xmonad --restart
-			sudo firewall onS
 			sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Mode changed";;
 		'Work')
-			notify 'Swipe your finger' && sudo firewall onS
-			xrandr --output VGA-1 --above LVDS-1 --auto && xrandr --output LVDS-1 --primary --below VGA-1 --auto && xmonad --restart
+			notify 'Swipe your finger' && sudo firewall onS &&
+			xrandr --output VGA-1 --above LVDS-1 --auto && xrandr --output LVDS-1 --primary --below VGA-1 --auto && xmonad --restart &&
 			sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u && notify "Mode changed";;
 		'Mobile')
-			notify 'Swipe your finger' && sudo ip link set down dev enp0s25 && sudo pkill dhcpcd
-			xrandr --output VGA-1 --off && xrandr --output LVDS-1 --auto && xmonad --restart
-			sudo firewall onS
-			sudo cp /etc/resolv.conf.example /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Mode changed";;
-	esac;;
-	'VPN')sleep .2;vpn;;
+			notify 'Swipe your finger' && sudo firewall onS ; sudo ip link set down dev enp0s25 ; sudo pkill dhcpcd
+			xrandr --output VGA-1 --off && xrandr --output LVDS-1 --primary --auto && xmonad --restart
+			sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Mode changed";;
+	esac
+}
+
+function vpn(){
+	sleep .2
+	location="/home/dimitris/.config/vpn/"
+	options=""
+
+	cd "$location"
+
+	for file in *; do
+		options+="$file"
+		options+="\n"
+	done
+
+	option="$(menu "$options" 'Which VPN?')"
+
+	[[ $option != "" ]] && xterm -background black -foreground white -e "cd $location && sudo openvpn '$option'"
+}
+
+# Main menu
+case $(menu 'Control Panel\nEdit\nMode\nVPN' 'Thinkpad X200') in
+	'Control Panel') control_panel;;
+	'Edit') sleep .2; file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d | dmenu -i -sb "$COLOR1" -p 'Select file:'` && (emacs $file & disown emacs);;
+	'Mode') mode;;
+	'VPN') vpn;;
 esac
