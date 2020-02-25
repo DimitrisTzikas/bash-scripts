@@ -65,7 +65,7 @@ if [[ $(whoami) == "root" ]]; then
 		      $IPT -P OUTPUT DROP
 		      $IPT -P INPUT DROP
 		      $IPT -P FORWARD DROP;;
-	       *) echo "Modes: off, on, onS panic" 1>&2; exit 1;;
+	       *) echo "Modes: off, on, onS, panic" 1>&2; exit 1;;
 	   esac;;
 	*) echo "Usage: firewall MODE" 1>&2; exit 1;;
     esac

@@ -5,37 +5,45 @@ function menu(){ printf "$1" | dmenu -i -sb "$COLOR1" -p "$2"; }
 
 function control_panel(){
 	sleep .2
-	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv\nDNS\nLock\nOverview' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
+	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv\nDNS\nFirewall\nLock\nOverview' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
 		'Wifi')
 			sleep .2
 			case $(menu 'Enable\nDisable' 'Select mode:') in
-				'Enable')rfkill unblock wifi && notify "Enabled";;
-				'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && notify "Disabled";;
+				'Enable')rfkill unblock wifi && notify 'Enabled';;
+				'Disable')sudo pkill wpa_supplicant ; rfkill block wifi && notify 'Disabled';;
 			esac;;
 		'Bluetooth')
 			sleep .2
 			case $(menu 'Enable\nDisable' 'Select mode:') in
-				'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && notify "Enabled";;
-				'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && notify "Disabled";;
+				'Enable')sudo systemctl start bluetooth && rfkill unblock bluetooth && notify 'Enabled';;
+				'Disable')sudo systemctl stop bluetooth && rfkill block bluetooth && notify 'Disabled';;
 			esac;;
 		'Ethernet')
 			sleep .2
 			case $(menu 'Enable\nDisable' 'Select mode:') in
-				'Enable')sudo ip link set up dev enp0s25 && notify "Enabled";;
-				'Disable')sudo ip link set down dev enp0s25 && notify "Disabled";;
+				'Enable')sudo ip link set up dev enp0s25 && notify 'Enabled';;
+				'Disable')sudo ip link set down dev enp0s25 && notify 'Disabled';;
 			esac;;
 		'Resolv')
 			sleep .2
 			case $(menu 'Main\nIHUVPN\nDynamic' 'Select mode:') in
-				'Main')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
-				'IHUVPN')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.ihuvpn /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify "Resolv Changed";;
-				'Dynamic')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u && notify "Resolv Changed";;
+				'Main')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.main /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify 'Resolv Changed';;
+				'IHUVPN')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo cp /etc/resolv.conf.ihuvpn /etc/resolv.conf && sudo chattr +i /etc/resolv.conf && notify 'Resolv Changed';;
+				'Dynamic')notify 'Swipe your finger' && sudo chattr -i /etc/resolv.conf && sudo rm /etc/resolv.conf && sudo resolvconf -u && notify 'Resolv Changed';;
 			esac;;
 		'DNS')
 			sleep .2
 			case $(menu 'Enable\nDisable' 'Select mode:') in
-				'Enable')notify 'Swipe your finger' && sudo chattr -i /etc/hosts && sudo cp /etc/hosts.backup /etc/hosts && sudo chattr +i /etc/hosts && notify "DNS blocking";;
-				'Disable')notify 'Swipe your finger' && sudo chattr -i /etc/hosts && sudo rm /etc/hosts && sudo touch /etc/hosts && sudo chattr +i /etc/hosts && notify "No DNS blocking";;
+				'Enable')notify 'Swipe your finger' && sudo chattr -i /etc/hosts && sudo cp /etc/hosts.backup /etc/hosts && sudo chattr +i /etc/hosts && notify 'DNS blocking';;
+				'Disable')notify 'Swipe your finger' && sudo chattr -i /etc/hosts && sudo rm /etc/hosts && sudo touch /etc/hosts && sudo chattr +i /etc/hosts && notify 'No DNS blocking';;
+			esac;;
+		'Firewall')
+			sleep .2
+			case $(menu 'On\nOnS\nOff\nPanic\n ' 'Select mode:') in
+				'On')notify 'Swipe your finger' && sudo firewall on && notify 'Mode changed';;
+				'OnS')notify 'Swipe your finger' && sudo firewall onS && notify 'Mode changed';;
+				'Off')notify 'Swipe your finger' && sudo firewall off && notify 'Mode changed';;
+				'Panic')notify 'Swipe your finger' && sudo firewall panic && notify 'Mode changed';;
 			esac;;
 		'Lock')
 			sleep .2; lock;;
