@@ -1,11 +1,15 @@
 #!/bin/bash
-function notify(){ notify-send -r 1 -u low "$1"; }
+function notify(){
+	notify-send -r 1 -u low "$1"
+}
 
-function menu(){ printf "$1" | dmenu -i -sb "$COLOR1" -p "$2"; }
+function menu(){
+	printf "$1" | dmenu -i -sb "$COLOR1" -p "$2"
+}
 
 function control_panel(){
 	sleep .2
-	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv\nDNS\nFirewall\nLock\nOverview' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
+	case $(printf 'Wifi\nBluetooth\nEthernet\nResolv\nDNS\nFirewall\nLock\nBlue\nOverview' | dmenu -i -sb "$COLOR1" -p "Select mode:") in
 		'Wifi')
 			sleep .2
 			case $(menu 'Enable\nDisable' 'Select mode:') in
@@ -46,7 +50,9 @@ function control_panel(){
 				'Panic')notify 'Swipe your finger' && sudo firewall panic && notify 'Mode changed';;
 			esac;;
 		'Lock')
-			sleep .2; lock;;
+			lock;;
+		'Blue')
+			mplayer "$HOME/.sounds/windows-xp-error.mp3" & i3lock -n -u -c 000080 -i "$HOME/Pictures/Wallpapers/blue-screen.png";;
 		'Overview')
 			notify-send -u low "Wifi: $(ifconfig | grep '^wls' > /dev/null && echo enabled || echo disabled)"
 			notify-send -u low "Bluetooth: $(systemctl status bluetooth.service | grep 'running' > /dev/null && echo enabled || echo disabled)"
@@ -54,6 +60,12 @@ function control_panel(){
 			notify-send -u low "Resolv: $( (head --lines=1 /etc/resolv.conf | grep '^options timeout:1' > /dev/null && echo Main) || (head --lines=1 /etc/resolv.conf | grep '^# Nameservers For TEI VPN' > /dev/null && echo IHU) || echo Dynamic )"		
 			notify-send -u low "DNS blocking: $(head --lines=1 /etc/hosts | grep '# DNS blocking' > /dev/null && echo enabled || echo disabled)"
 	esac
+}
+
+function edit(){
+	sleep .2
+	file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d`
+	file=`menu "$file" 'Select file:'` && (emacs $file & disown emacs)
 }
 
 function mode(){
@@ -91,10 +103,21 @@ function vpn(){
 	[[ $option != "" ]] && xterm -background black -foreground white -e "cd $location && sudo openvpn '$option'"
 }
 
+function settings(){
+	sleep .2
+	case $(menu 'Wallpaper' 'Settings:') in
+		'Wallpaper')
+			sleep .2
+			wallpaper=`find ~/Pictures/Wallpapers -type f | rev | cut -d'/' -f1 | rev` 
+			wallpaper=`menu "$wallpaper" 'Select wallpaper:'` && feh --bg-scale ~/Pictures/Wallpapers/"$wallpaper";;
+	esac
+}
+
 # Main menu
-case $(menu 'Control Panel\nEdit\nMode\nVPN' 'Thinkpad X200') in
+case $(menu 'Control Panel\nEdit\nMode\nVPN\nSettings' 'Thinkpad X200') in
 	'Control Panel') control_panel;;
-	'Edit') sleep .2; file=`find ~/.dotfiles/ThinkpadX200s -type f | grep -v emacs.d | dmenu -i -sb "$COLOR1" -p 'Select file:'` && (emacs $file & disown emacs);;
+	'Edit') edit;;
 	'Mode') mode;;
 	'VPN') vpn;;
+	'Settings') settings;;
 esac
