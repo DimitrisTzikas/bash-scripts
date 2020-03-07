@@ -1,0 +1,26 @@
+#!/bin/bash
+
+source utilities
+
+function monitor_mode(){
+    [[ $# -eq 0 ]] && return
+    if [[ $1 == "on" ]]; then
+	iw=`(iwconfig | awk '/wl/ {print $1}') 2>/dev/null` &&
+	    iw=`menu 'Change to monitor mode:' "$iw"`
+	if [[ "$(sudo ip link show up $iw)" == "" ]]; then
+	    notify "Interface is disabled"
+	    return
+	else
+	    notify &&
+		sudo airmon-ng start "$iw" &&
+		iw=`(iwconfig | awk '/wl/ {print $1}' | grep "$iw") 2>/dev/null` &&
+		notify "Interface changed to $iw"
+	fi
+    elif [[ $1 == "off" ]]; then
+	iw=`(iwconfig | awk '/wl/ {print $1}' | grep mon) 2>/dev/null` &&
+	    iw=`menu 'Change to normal mode:' "$iw"` &&
+	    sudo airmon-ng stop "$iw" &&
+	    notify "Interface changed to $(echo $iw | sed 's/mon//g')"
+    fi
+}
+

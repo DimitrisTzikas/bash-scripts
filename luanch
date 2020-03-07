@@ -1,20 +1,5 @@
 #!/bin/bash
-function notify(){
-    if [[ "$#" -eq 0 ]]; then
-	notify-send -r 1 -u low 'Swipe your finger'
-    else
-	if [[ "$1" == "no-id" ]]; then
-	    notify-send -u low "$2"
-	else
-	    notify-send -r 1 -u low "$1"
-	fi
-    fi
-}
-
-function menu(){
-    sleep .2
-    printf "$2" | dmenu -i -sb "$COLOR1" -p "$1"
-}
+source utilities
 
 function resolv(){
     case $1 in
@@ -138,7 +123,7 @@ function control_panel(){
 			notify 'Mode changed';;
 		'Mode')
 		    notify &&
-			notify "$(sudo firewall)"
+			notify "$(sudo firewall | head --lines=1)"
 	    esac;;
 	'Overview')
 	    notify no-id "Wifi: $(ifconfig | grep '^wls' > /dev/null && echo enabled || echo disabled)"
@@ -175,8 +160,8 @@ function mode(){
 		sudo firewall onS &&
 		sudo ip link set up dev enp0s25 &&
 		sudo pkill wpa_supplicant
-	    xrandr --output VGA-1 --primary --left-of LVDS-1 --auto &&
-		xrandr --output LVDS-1 --right-of VGA-1 --auto &&
+	    xrandr --output VGA-1 --primary --auto &&
+		xrandr --output LVDS-1 --off &&
 		xmonad --restart
 	    resolv encrypted &&
 		notify "Mode changed";;

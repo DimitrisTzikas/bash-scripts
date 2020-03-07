@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function notify(){
+    if [[ "$#" -eq 0 ]]; then
+	notify-send -r 1 -u low 'Swipe your finger'
+    else
+	if [[ "$1" == "no-id" ]]; then
+	    notify-send -u low "$2"
+	else
+	    notify-send -r 1 -u low "$1"
+	fi
+    fi
+}
+
+function menu(){
+    sleep .2
+    printf "$2" | dmenu -i -sb "$COLOR1" -p "$1"
+}
