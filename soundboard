@@ -1,6 +1,0 @@
-#!/bin/bash
-
-soundDirectory="/home/dimitris/.sounds"
-sound=$(ls "$soundDirectory" | dmenu -i -sb "$COLOR1" -p "Sounds:")
-
-mplayer "$soundDirectory/$sound"
