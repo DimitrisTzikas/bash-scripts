@@ -12,7 +12,12 @@ function notify(){
     fi
 }
 
+#function menu(){
+#    sleep .2
+#    printf "$2" | dmenu -i -sb "$COLOR1" -p "$1"
+#}
+
 function menu(){
     sleep .2
-    printf "$2" | dmenu -i -sb "$COLOR1" -p "$1"
+    printf "$2" | rofi -theme "$3" -p "$1" -dmenu
 }

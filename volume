@@ -1,0 +1,26 @@
+#!/bin/bash
+
+source utilities
+
+sink="$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)"
+
+case "$1" in
+    'up')
+	pactl set-sink-mute "$sink" false
+	if [[ "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)" -lt 100 ]]; then
+	    pactl set-sink-volume "$sink" +5%
+	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	fi;;
+    'down')
+	pactl set-sink-mute "$sink" false
+	pactl set-sink-volume "$sink" -5%
+	notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)";;
+    'toggle')
+	pactl set-sink-mute "$sink" toggle
+	if amixer get Master | grep -Fq '[off]'; then
+	    notify "Muted"
+	else
+	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	fi;;
+esac
+
