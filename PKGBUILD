@@ -36,7 +36,9 @@ package() {
     install -d "${pkgdir}/usr/local/bin/"
     cd "${srcdir}/bash-scripts"
     for file in *; do
-	if [[ $file != "LICENSE" ]]; then
+	if echo "$file" | grep ".conf >/dev/null"; then
+	    install -m644 "${srcdir}/bash-scripts/$file" "${pkgdir}/etc/"
+	elif [[ $file != "LICENSE" ]]; then
 	    install -m755 "${srcdir}/bash-scripts/$file" "${pkgdir}/usr/local/bin/"
 	fi
     done
