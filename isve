@@ -1,25 +1,5 @@
 #!/bin/bash
 
-###########################################################
-#
-# Internet Sharing Via Ethernet
-#
-# Written by Dimitri Tzika
-#
-# Synopsis: isve OPTION
-#
-# Options: off, WIFI-INTERFACE, NONE
-# off: Stop sharing network
-# WIFI-INTERFACE: Share network from WIFI-INTERFACE
-# NONE: Show INTERFACES
-#
-# Examples:
-# isve off
-# isve wls1
-# isve
-#
-###########################################################
-
 # Check for root user
 if [[ $(whoami) == "root" ]]; then
     case $# in

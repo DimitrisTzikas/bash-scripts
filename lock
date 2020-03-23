@@ -1,31 +1,16 @@
 #!/bin/bash
 
-###########################################################
-#
-# Lock
-#
-# Dependencies: i3lock-lixxia-git, scrot, ImageMagic
-#
-# Written by "https://www.reddit.com/r/unixporn/comments/3358vu/i3lock_unixpornworthy_lock_screen/"
-#
-# Synopsis: lock
-#
-# Examples:
-# lock
-#
-###########################################################
-
 # Play lock sound
-(sleep 1.1 && mplayer "$HOME/.sounds/lock2.wav") &
+#(sleep 1.1 && mplayer "$HOME/.sounds/lock2.wav") &
 
 # Us keyboard layout and swap caps lock with escape
-setxkbmap us && xmodmap -e 'clear Lock' && xmodmap -e 'keycode 0x42=Escape' && xmodmap -e 'keycode 0x9=Caps_Lock'
+setxkbmap us && xmodmap ~/.Xmodmap
 
 # Pixelate background
-ICON="$HOME/Pictures/Wallpapers/icon2.png"
+#ICON="$HOME/Pictures/Wallpapers/icon2.png"
 TMPBG=/tmp/screen.png
 scrot "$TMPBG"
 convert "$TMPBG" -scale 10% -scale 1000% "$TMPBG"
-convert "$TMPBG" "$ICON" -gravity center -composite -matte "$TMPBG"
-i3lock -n -u -i "$TMPBG" && mplayer "$HOME/.sounds/lock2.wav"
+#convert "$TMPBG" "$ICON" -gravity center -composite -matte "$TMPBG"
+i3lock -n -u -i "$TMPBG" #&& mplayer "$HOME/.sounds/lock2.wav"
 rm "$TMPBG"

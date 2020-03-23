@@ -1,20 +1,5 @@
 #!/bin/bash
 
-###########################################################
-#
-# Simple Alarm
-#
-# Written by Dimitri Tzika
-#
-# Synopsis: wakeup
-#
-# Arguments:
-#
-# Examples:
-# wakeup
-#
-###########################################################
-
 # Variables for custom options
 time=0
 music=""

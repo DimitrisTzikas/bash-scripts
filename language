@@ -1,0 +1,9 @@
+#!/bin/bash
+
+source utilities
+
+setxkbmap -print | grep us >/dev/null &&
+    setxkbmap gr ||
+	setxkbmap us
+xmodmap ~/.Xmodmap
+notify `setxkbmap -print | grep pc+ | cut -d+ -f2`

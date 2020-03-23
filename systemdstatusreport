@@ -1,26 +1,5 @@
 #!/bin/bash
 
-###########################################################
-#
-# Systemd Status Report
-#
-# Written by Dimitri Tzika
-#
-# Synopsis: systemdstatusreport MODE
-#
-# Arguments: NONE, favorite, all, enabled, disabled
-# NONE and favorite: show status of favorite services
-# all: show status of all services
-# enabled: show enabled services
-# disabled: show disabled services
-# static: show static services
-#
-# Examples:
-# systemdstatusreport
-# systemdstatusreport enabled
-#
-###########################################################
-
 # "Favorite" services
 servicesToCheck='sshd vsftpd netdata NetworkManager'
 

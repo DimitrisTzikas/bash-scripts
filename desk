@@ -1,26 +1,5 @@
 #!/bin/bash
 
-###########################################################
-#
-# Smart Desk Control
-#
-# Written by Dimitri Tzika
-#
-# Synopsis: desk OPTION
-#
-# OPTIONS: backLight, monitor, light
-# backLight: toggle backLight
-# monitor: toggle monitor
-# light: toggle light
-#
-# Examples:
-# desk light
-# desk monitor
-# desk l
-# desk bl
-#
-###########################################################
-
 if [[ "$#" -ne 1 ]]; then
     echo "Too many arguments or none" 1>&2
     exit 1

@@ -1,33 +1,15 @@
 #!/bin/bash
 
-###########################################################
-#
-# IP Tables Script
-#
-# Written by Dimitri Tzika
-#
-# Synopsis: firewall MODE
-#
-# Modes: off, on, onS, panic
-# off: Accept all
-# on: Accept only output and established
-# onS: Accept only output, established and 127.0.0.1
-# panic: Accept none
-#
-# Examples:
-# firewall on
-# firewall
-#
-###########################################################
-
 # Check for root user
 if [[ $(whoami) == "root" ]]; then
     case $# in
 	0) count=$(iptables -L -n | grep -c DROP)
 	   if [[ $count -eq 1 ]]; then
 	       echo "Firewall: off"
+	   elif [[ $(iptables -L -n | grep "tcp dpt:22") ]]; then
+	       echo "Firewall: onLD"
 	   elif [[ $count -eq 2 ]]; then
-	       [[ $(iptables -L -n | grep 127.0.0.1) ]] && echo "Firewall: onS" || echo "Firewall: on"
+	       [[ $(iptables -L -n | grep 127.0.0.1) ]] && echo "Firewall: onL" || echo "Firewall: on"
 	   else
 	       echo "Firewall: panic"
 	   fi;;
@@ -35,37 +17,58 @@ if [[ $(whoami) == "root" ]]; then
 	1) IPT=/sbin/iptables
 	   case $1 in
 	       # ACCEPT ALL
-	       off) $IPT -F
-		    #Policies
-		    $IPT -P OUTPUT ACCEPT
-		    $IPT -P INPUT ACCEPT
-		    $IPT -P FORWARD DROP;;
+	       off)
+		   $IPT -F
+		   # Policies
+		   $IPT -P OUTPUT ACCEPT
+		   $IPT -P INPUT ACCEPT
+		   $IPT -P FORWARD DROP;;
 	   
 	       # ACCEPT ONLY OUTPUT AND ESTABLISHED
-	       on) $IPT -F
-		   #Policies
+	       on)
+		   $IPT -F
+		   # Policies
 		   $IPT -P OUTPUT ACCEPT
 		   $IPT -P INPUT DROP
 		   $IPT -P FORWARD DROP
-		   #Allow Responses
+		   # Allow Responses
 		   $IPT -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT;;
 
-	       # ACCEPT ONLY OUTPUT, ESTABLISHED AND 127.0.0.1
-	       onS) $IPT -F
-		    #Policies
-		    $IPT -P OUTPUT ACCEPT
-		    $IPT -P INPUT DROP
-		    $IPT -P FORWARD DROP
-		    #Allow Responses
-		    $IPT -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT;
-		    $IPT -A INPUT -s 127.0.0.1 -j ACCEPT;;
-	       
+	       onL)
+		   $IPT -F
+		   # Policies
+		   $IPT -P OUTPUT ACCEPT
+		   $IPT -P INPUT DROP
+		   $IPT -P FORWARD DROP
+		   # Allow Responses
+		   $IPT -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		   # Allow local
+		   $IPT -A INPUT -s 127.0.0.1 -j ACCEPT;;
+
+	       onLD)
+		   $IPT -F
+		   # Policies
+		   $IPT -P OUTPUT ACCEPT
+		   $IPT -P INPUT DROP
+		   $IPT -P FORWARD DROP
+		   # Allow Responses
+		   $IPT -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		   # Allow local
+		   $IPT -A INPUT -s 127.0.0.1 -j ACCEPT
+		   for line in `cat /etc/firewall.conf | grep '^[0-9]'`
+		   do
+		       port="$(echo $line | cut -d- -f1)"
+		       mac="$(echo $line | cut -d- -f2)"
+		       $IPT -A INPUT -p tcp --destination-port "$port" -m mac --mac-source "$mac" -j ACCEPT
+		   done;;
+		   
 	       # ACCEPT NONE
-	       panic) #Policies
-		      $IPT -P OUTPUT DROP
-		      $IPT -P INPUT DROP
-		      $IPT -P FORWARD DROP;;
-	       *) echo "Modes: off, on, onS, panic" 1>&2; exit 1;;
+	       panic)
+		   # Policies
+		   $IPT -P OUTPUT DROP
+		   $IPT -P INPUT DROP
+		   $IPT -P FORWARD DROP;;
+	       *) echo "Modes: off, on, onL, onLD, panic" 1>&2; exit 1;;
 	   esac;;
 	*) echo "Usage: firewall MODE" 1>&2; exit 1;;
     esac

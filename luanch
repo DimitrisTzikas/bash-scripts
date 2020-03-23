@@ -87,14 +87,18 @@ function control_panel(){
 		sudo chattr +i /etc/hosts &&
 		notify 'DNS blocking';;
 	'')
-	    case $(menu '' 'on\nons\noff\npanic\nmode' 'entry.rasi') in
+	    case $(menu '' 'on\nonl\nonld\noff\npanic\nmode' 'entry.rasi') in
 		'on')
 		    notify &&
 			sudo firewall on &&
 			notify 'Mode changed';;
-		'ons')
+		'onl')
 		    notify &&
-			sudo firewall onS &&
+			sudo firewall onL &&
+			notify 'Mode changed';;
+		'onld')
+		    notify &&
+			sudo firewall onLD &&
 			notify 'Mode changed';;
 		'off')
 		    notify &&
@@ -124,17 +128,28 @@ function control_panel(){
 }
 
 function action(){
-    case $(menu 'Action' 'lock\nprograms\nblue\nnight-night' 'entry.rasi') in
+    case $(menu 'Action' 'lock\nprograms\nsshd\nnight-night' 'entry.rasi') in
 	'lock')
 	    lock;;
 	'programs')
 	    rhythmbox & disown %rhythmbox
 	    telegram-desktop & disown %telegram-desktop
 	    com.slack.Slack &
-	    syncthing-gtk & disown %syncthing-gtk;;
-	'blue')
-	    mplayer "$HOME/.sounds/windows-xp-error.mp3" &
-	    i3lock -n -u -c 000080 -i "$HOME/Pictures/Wallpapers/blue-screen.png";;
+	    syncthing-gtk & disown %syncthing-gtk
+	    gnome-calendar & disown %gnome-calendar
+	    trello & disown %trello;;
+	'sshd')
+	    if systemctl status sshd; then
+		notify &&
+		    sudo systemctl stop sshd &&
+		    sudo firewall onL &&
+		    notify "SSH disabled"
+	    else
+		notify &&
+		    sudo systemctl start sshd &&
+		    sudo firewall onLD &&
+		    notify "SSH enabled"
+	    fi;;
 	'night-night')
 	    systemctl hibernate;;
     esac
@@ -150,7 +165,7 @@ function mode(){
     case $(menu 'Mode' 'home\nwork\nmobile' 'entry.rasi') in
 	'home')
 	    notify &&
-		sudo firewall onS
+		sudo firewall onl
 	    sudo ip link set up dev enp0s25 &&
 		sudo pkill wpa_supplicant &&
 		sudo pkill dhcpcd &&
@@ -162,7 +177,7 @@ function mode(){
 		notify "Mode changed";;
 	'work')
 	    notify &&
-		sudo firewall onS
+		sudo firewall onl
 	    xrandr --output VGA-1 --above LVDS-1 --auto &&
 		xrandr --output LVDS-1 --primary --below VGA-1 --auto &&
 		xmonad --restart &&
@@ -170,7 +185,7 @@ function mode(){
 		notify "Mode changed";;
 	'mobile')
 	    notify &&
-		sudo firewall onS
+		sudo firewall onl
 	    sudo ip link set down dev enp0s25 &&
 		sudo pkill dhcpcd
 	    xrandr --output VGA-1 --off &&
