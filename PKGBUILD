@@ -22,7 +22,6 @@ depends=(
     'scrot'
     'imagemagick'
     'alsa-utils'
-    'alsa-tools'
     'alsa-plugins'
 )
 source=("git://github.com/DimitrisTzikas/bash-scripts.git#branch=master")
