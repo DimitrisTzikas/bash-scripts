@@ -22,5 +22,11 @@ case "$1" in
 	else
 	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
 	fi;;
+    'music-up')
+	playerctl volume 0.1+ &&
+	    notify "$(bc <<< $(playerctl volume)*100 | cut -d. -f1)";;
+    'music-down')
+	playerctl volume 0.1- &&
+	    notify "$(bc <<< $(playerctl volume)*100 | cut -d. -f1)";;
 esac
 

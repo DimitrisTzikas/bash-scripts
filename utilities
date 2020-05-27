@@ -19,5 +19,5 @@ function notify(){
 
 function menu(){
     sleep .2
-    printf "$2" | rofi -theme "$3" -p "$1" -dmenu
+    printf "$2" | rofi -theme "$3" -p "$1" -dmenu -i
 }

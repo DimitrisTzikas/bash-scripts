@@ -32,13 +32,17 @@ build() {
 }
 
 package() {
-    install -d "${pkgdir}/usr/local/bin/"
     cd "${srcdir}/bash-scripts"
-    for file in *; do
-	if echo "$file" | grep ".conf >/dev/null"; then
-	    install -m644 "${srcdir}/bash-scripts/$file" "${pkgdir}/etc/"
-	elif [[ $file != "LICENSE" ]]; then
+
+    install -d "${pkgdir}/usr/local/bin/"
+    for file in *[^.conf]; do
+	if [[ $file != "LICENSE" ]]; then
 	    install -m755 "${srcdir}/bash-scripts/$file" "${pkgdir}/usr/local/bin/"
 	fi
+    done
+
+    install -d "${pkgdir}/etc/"
+    for file in *.conf; do
+	install -m644 "${srcdir}/bash-scripts/$file" "${pkgdir}/etc/"
     done
 }

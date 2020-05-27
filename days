@@ -1,0 +1,14 @@
+#!/bin/bash
+
+case $1 in
+    '--death')
+	echo $(( (3471292800 - $(date +%s)) / 86400 ));;
+    '--semester-end')
+	echo $(( (1590710400 - $(date +%s)) / 86400 ));;
+    '--exams')
+	echo $(( (1591660800 - $(date +%s)) / 86400 )) Days until exams;;
+    '--alex')
+	echo $(( ($(date +%s) - 1241654400) / 86400 )) Days, Alexandros;;
+    '')
+	echo $(( ($(date +%s) - 919209600) / 86400 )) Days on Earth;;
+esac

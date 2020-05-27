@@ -1,0 +1,12 @@
+#!/bin/bash
+
+user=~
+wallpaper="animecity"
+
+feh --no-fehbg --bg-fill "$user/Pictures/Wallpapers/DynamicWallpapers/$wallpaper/`date +%H`.jpg"
+
+if [[ `date +%H` -ge 7 || `date +%H` -le 20 ]]; then
+    echo "<fn=1>\xf185</fn>"
+else
+    echo "<fn=1>\xf186</fn>"
+fi

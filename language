@@ -1,9 +1,18 @@
 #!/bin/bash
-
 source utilities
 
-setxkbmap -print | grep us >/dev/null &&
-    setxkbmap gr ||
-	setxkbmap us
-xmodmap ~/.Xmodmap
+if [[ "$1" == "en" ]]; then
+    setxkbmap us &&
+	xmodmap ~/.Xmodmap
+elif [[ "$1" == "gr" ]]; then
+    setxkbmap gr &&
+	xmodmap ~/.Xmodmap
+else
+    setxkbmap -print | grep us >/dev/null &&
+	setxkbmap gr ||
+	    setxkbmap us
+    xmodmap ~/.Xmodmap
+fi
+
 notify `setxkbmap -print | grep pc+ | cut -d+ -f2`
+

@@ -1,0 +1,171 @@
+#!/bin/bash
+
+source utilities
+
+function change_color(){
+    sed -i "s/myFocusedBorderColor   = \"#[[:xdigit:]]*\"/myFocusedBorderColor   = \"${colors[0]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
+    sed -i "s/myNormalBorderColor    = \"#[[:xdigit:]]*\"/myNormalBorderColor    = \"${colors[1]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
+    sed -i "s/myHiddenNoWindowsColor = \"#[[:xdigit:]]*\"/myHiddenNoWindowsColor = \"${colors[2]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
+    sed -i "s/myNonEmptyColor        = \"#[[:xdigit:]]*\"/myNonEmptyColor        = \"${colors[3]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
+    sed -i "s/myCurrentColor         = \"#[[:xdigit:]]*\"/myCurrentColor         = \"${colors[4]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
+
+    sed -i "s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[5]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar.conf
+    sed -i "s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[6]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar.conf
+    sed -i "s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[7]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar-top.conf
+    sed -i "s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[8]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar-top.conf
+
+    sed -i "s/background \"#[[:xdigit:]]*\"/background \"${colors[9]}\"/g" ~/.dotfiles/ThinkpadX200s/.stalonetrayrc
+
+    sed -i "s/accent: #[[:xdigit:]]*;/accent: ${colors[10]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+    sed -i "s/background: #[[:xdigit:]]*;/background: ${colors[11]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+    sed -i "s/background-light: #[[:xdigit:]]*;/background-light: ${colors[12]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+    sed -i "s/background-focus: #[[:xdigit:]]*;/background-focus: ${colors[13]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+    sed -i "s/foreground: #[[:xdigit:]]*;/foreground: ${colors[14]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+    sed -i "s/foreground-list: #[[:xdigit:]]*;/foreground-list: ${colors[15]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+
+    sed -i "s/background	= #[[:xdigit:]]*/background	= ${colors[16]}/g" ~/.dotfiles/ThinkpadX200s/.config/termite/config
+    sed -i "s/color12 = #[[:xdigit:]]*/color12 = ${colors[17]}/g" ~/.dotfiles/ThinkpadX200s/.config/termite/config
+    
+    sed -i "s/    background = \"#[[:xdigit:]]*\"/    background = \"${colors[18]}\"/g" ~/.dotfiles/ThinkpadX200s/.config/dunst/dunstrc
+    sed -i "s/    foreground = \"#[[:xdigit:]]*\"/    foreground = \"${colors[19]}\"/g" ~/.dotfiles/ThinkpadX200s/.config/dunst/dunstrc
+
+    sed -i "s/ gradient_color_1 = '#[[:xdigit:]]*'/ gradient_color_1 = '${colors[20]}'/g" ~/.dotfiles/ThinkpadX200s/.config/cava/config
+    sed -i "s/ gradient_color_2 = '#[[:xdigit:]]*'/ gradient_color_2 = '${colors[21]}'/g" ~/.dotfiles/ThinkpadX200s/.config/cava/config
+
+    # Firefox Border, Firefox Background, Fonts
+    sed -i "s/    --grey-50: #[[:xdigit:]]*;/    --grey-50: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-70: #[[:xdigit:]]*;/    --grey-70: ${colors[23]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-30: #[[:xdigit:]]*;/    --grey-30: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-40: #[[:xdigit:]]*;/    --grey-40: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-60: #[[:xdigit:]]*;/    --grey-60: ${colors[24]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+
+    # GTK
+    GTK_COLORS=`cat "$HOME/.themes/custom/gtk-3.0/gtk.css" | head -n4 | tail -n3`
+    GTK_COLOR1=`echo $GTK_COLORS | cut -d' ' -f1`
+    GTK_COLOR2=`echo $GTK_COLORS | cut -d' ' -f2`
+    GTK_COLOR3=`echo $GTK_COLORS | cut -d' ' -f3`
+    sed -i "s/$GTK_COLOR1/${colors[25]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
+    sed -i "s/$GTK_COLOR2/${colors[26]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
+    sed -i "s/$GTK_COLOR3/${colors[27]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
+}
+
+if [[ "$1" == ~/Pictures/Wallpapers/glider.jpg ]]; then
+    colors+=("#FFFFFF") # xmonad Focused Border Color
+    colors+=("#777777") # xmonad Normal Border Color
+    colors+=("#333333") # xmonad Hidden No Windows Color
+    colors+=("#999999") # xmonad Non Empty Color
+    colors+=("#FFFFFF") # xmonad Current Color
+    colors+=("#12151A") # xmobar bgColor bot
+    colors+=("#999999") # xmobar fgColor bot
+    colors+=("#12151A") # xmobar bgColor top
+    colors+=("#999999") # xmobar fgColor top
+    colors+=("#12151A") # stalonetray
+    colors+=("#A0A0A0") # rofi accent
+    colors+=("#12151A") # rofi background
+    colors+=("#32353A") # rofi background-light
+    colors+=("#42454A") # rofi background-focus
+    colors+=("#888888") # rofi foreground
+    colors+=("#BBBBBB") # rofi foreground-list
+    colors+=("#12151A") # termite background
+    colors+=("#81A2BE") # termite foreground
+    colors+=("#12151A") # dunst background
+    colors+=("#FFFFFF") # dunst foreground
+    colors+=("#404040") # cava color1
+    colors+=("#AAAAAA") # cava color2
+    colors+=("#81A2BE") # firefox 1
+    colors+=("#12151A") # firefox 2
+    colors+=("#555555") # firefox 3
+    colors+=("#12151A") # gtk1
+    colors+=("#81A2BE") # gtk2
+    colors+=("#555555") # gtk3
+    change_color colors
+
+    feh --bg-fill ~/Pictures/Wallpapers/glider.jpg &&
+	pkill stalonetray &&
+	pkill xmobar &&
+	xmonad --restart
+
+elif [[ "$1" == ~/Pictures/Wallpapers/rainy-day.png ]]; then
+    colors+=("#D0A9C2") # xmonad Focused Border Color
+    colors+=("#777777") # xmonad Normal Border Color
+    colors+=("#323A33") # xmonad Hidden No Windows Color
+    colors+=("#927E86") # xmonad Non Empty Color
+    colors+=("#D0A9C2") # xmonad Current Color
+    colors+=("#323A33") # xmobar bgColor bot
+    colors+=("#6B7883") # xmobar fgColor bot
+    colors+=("#323A33") # xmobar bgColor top
+    colors+=("#6B7883") # xmobar fgColor top
+    colors+=("#323A33") # stalonetray
+    colors+=("#D0A9C2") # rofi accent
+    colors+=("#323A33") # rofi background
+    colors+=("#4F5E52") # rofi background-light
+    colors+=("#5F6E62") # rofi background-focus
+    colors+=("#888888") # rofi foreground
+    colors+=("#BBBBBB") # rofi foreground-list
+    colors+=("#323A33") # termite background
+    colors+=("#D0A9C2") # termite foreground
+    colors+=("#323A33") # dunst background
+    colors+=("#D0A9C2") # dunst foreground
+    colors+=("#323A33") # cava color1
+    colors+=("#D0A9C2") # cava color2
+    colors+=("#D0A9C2") # firefox 1
+    colors+=("#323A33") # firefox 2
+    colors+=("#4F5E52") # firefox 3
+    colors+=("#323A33") # gtk1
+    colors+=("#D0A9C2") # gtk2
+    colors+=("#4F5E52") # gtk3
+    change_color colors
+
+    feh --bg-fill ~/Pictures/Wallpapers/rainy-day.png &&
+	pkill stalonetray &&
+	pkill xmobar &&
+	xmonad --restart    
+    
+elif [ ! -z "$1" ]; then
+    colors_data=$(convert $1 -geometry 16x16 -colors 8 -unique-colors txt:- |
+		      grep '#[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]' |
+		      cut -d' ' -f4
+	       )
+    
+    for i in $colors_data; do
+	picked_colors+=("$i")
+    done
+    length=$(bc <<< "${#picked_colors[*]} - 1")
+    
+    if [[ $length -ge 3 ]]; then
+	colors+=("${picked_colors[1]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[1]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[1]}")
+	colors+=("${picked_colors[2]}")
+	colors+=("${picked_colors[3]}")
+	colors+=("${picked_colors[3]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[1]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[2]}")
+	colors+=("${picked_colors[0]}")
+	colors+=("${picked_colors[$length]}")
+	colors+=("${picked_colors[2]}")
+	change_color colors
+	
+	feh --bg-fill "$1" &&
+	    pkill stalonetray &&
+	    pkill xmobar &&
+	    xmonad --restart
+    fi
+fi
