@@ -1,12 +1,12 @@
 #!/bin/bash
 
 user=~
-wallpaper="animecity"
+wallpaper="hachioji"
 
-feh --no-fehbg --bg-fill "$user/Pictures/Wallpapers/DynamicWallpapers/$wallpaper/`date +%H`.jpg"
+feh --bg-scale "$user/Pictures/Wallpapers/DynamicWallpapers/$wallpaper/`date +%H | sed 's/^0//g'`.jpg"
 
-if [[ `date +%H` -ge 7 || `date +%H` -le 20 ]]; then
-    echo "<fn=1>\xf185</fn>"
+if [[ `date +%H | sed 's/^0//g'` -ge 07 && `date +%H | sed 's/^0//g'` -le 20 ]]; then
+    echo ""
 else
-    echo "<fn=1>\xf186</fn>"
+    echo ""
 fi
