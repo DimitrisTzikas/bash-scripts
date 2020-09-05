@@ -16,15 +16,18 @@ insidewrongcolor=00000000
 keyhlcolor=AAAAAAFF
 bshlcolor=AAAAAAFF
 
-# Us keyboard layout and swap caps lock with escape
+# Us keyboard layout and load keyboard config
 setxkbmap us && xmodmap ~/.Xmodmap
 
-# Pixelate background
-#ICON="$HOME/Pictures/Wallpapers/icon2.png"
 TMPBG=/tmp/screen.png
-scrot "$TMPBG"
-convert "$TMPBG" -scale 10% -scale 1000% "$TMPBG"
-#convert "$TMPBG" "$ICON" -gravity center -composite -matte "$TMPBG"
+
+if [ $# -eq 0 ]; then
+    # Pixelate background
+    scrot "$TMPBG"
+    convert "$TMPBG" -scale 10% -scale 1000% "$TMPBG"
+elif [ "$1" == "--bg" ]; then
+    convert -resize 1980x1080! `cat ~/.lockbg` "$TMPBG"
+fi
 
 i3lock -t -i "$TMPBG" \
     --clock --force-clock --timepos="w/2:h/2" --timesize=96 --timecolor=FFFFFFFF \
@@ -38,6 +41,4 @@ i3lock -t -i "$TMPBG" \
     --screen=1
 
 rm "$TMPBG"
-
-
 

@@ -3,50 +3,47 @@
 source utilities
 
 function change_color(){
-    sed -i "s/myFocusedBorderColor   = \"#[[:xdigit:]]*\"/myFocusedBorderColor   = \"${colors[0]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
-    sed -i "s/myNormalBorderColor    = \"#[[:xdigit:]]*\"/myNormalBorderColor    = \"${colors[1]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
-    sed -i "s/myHiddenNoWindowsColor = \"#[[:xdigit:]]*\"/myHiddenNoWindowsColor = \"${colors[2]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
-    sed -i "s/myNonEmptyColor        = \"#[[:xdigit:]]*\"/myNonEmptyColor        = \"${colors[3]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
-    sed -i "s/myCurrentColor         = \"#[[:xdigit:]]*\"/myCurrentColor         = \"${colors[4]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmonad.hs
+    sed -i "s/myFocusedBorderColor   = \"#[[:xdigit:]]*\"/myFocusedBorderColor   = \"${colors[0]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmonad.hs
+    sed -i "s/myNormalBorderColor    = \"#[[:xdigit:]]*\"/myNormalBorderColor    = \"${colors[1]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmonad.hs
+    sed -i "s/myHiddenNoWindowsColor = \"#[[:xdigit:]]*\"/myHiddenNoWindowsColor = \"${colors[2]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmonad.hs
+    sed -i "s/myNonEmptyColor        = \"#[[:xdigit:]]*\"/myNonEmptyColor        = \"${colors[3]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmonad.hs
+    sed -i "s/myCurrentColor         = \"#[[:xdigit:]]*\"/myCurrentColor         = \"${colors[4]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmonad.hs
 
-    sed -i "s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[5]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar.conf
-    sed -i "s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[6]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar.conf
-    sed -i "s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[7]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar-top.conf
-    sed -i "s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[8]}\"/g" ~/.dotfiles/ThinkpadX200s/.xmonad/xmobar-top.conf
+    sed -i "s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[5]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmobar.conf
+    sed -i "s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[6]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmobar.conf
+    sed -i "s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[7]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmobar-top.conf
+    sed -i "s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[8]}\"/g" ~/.dotfiles/BitfenixNeos/.xmonad/xmobar-top.conf
 
-    sed -i "s/background \"#[[:xdigit:]]*\"/background \"${colors[9]}\"/g" ~/.dotfiles/ThinkpadX200s/.stalonetrayrc
+    sed -i "s/background \"#[[:xdigit:]]*\"/background \"${colors[9]}\"/g" ~/.dotfiles/BitfenixNeos/.stalonetrayrc
 
-    sed -i "s/accent: #[[:xdigit:]]*;/accent: ${colors[10]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
-    sed -i "s/background: #[[:xdigit:]]*;/background: ${colors[11]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
-    sed -i "s/background-light: #[[:xdigit:]]*;/background-light: ${colors[12]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
-    sed -i "s/background-focus: #[[:xdigit:]]*;/background-focus: ${colors[13]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
-    sed -i "s/foreground: #[[:xdigit:]]*;/foreground: ${colors[14]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
-    sed -i "s/foreground-list: #[[:xdigit:]]*;/foreground-list: ${colors[15]};/g" ~/.dotfiles/ThinkpadX200s/.config/rofi/colors.rasi
+    sed -i "s/accent: #[[:xdigit:]]*;/accent: ${colors[10]};/g" ~/.dotfiles/BitfenixNeos/.config/rofi/colors.rasi
+    sed -i "s/background: #[[:xdigit:]]*;/background: ${colors[11]};/g" ~/.dotfiles/BitfenixNeos/.config/rofi/colors.rasi
+    sed -i "s/background-light: #[[:xdigit:]]*;/background-light: ${colors[12]};/g" ~/.dotfiles/BitfenixNeos/.config/rofi/colors.rasi
+    sed -i "s/background-focus: #[[:xdigit:]]*;/background-focus: ${colors[13]};/g" ~/.dotfiles/BitfenixNeos/.config/rofi/colors.rasi
+    sed -i "s/foreground: #[[:xdigit:]]*;/foreground: ${colors[14]};/g" ~/.dotfiles/BitfenixNeos/.config/rofi/colors.rasi
+    sed -i "s/foreground-list: #[[:xdigit:]]*;/foreground-list: ${colors[15]};/g" ~/.dotfiles/BitfenixNeos/.config/rofi/colors.rasi
 
-    sed -i "s/background	= #[[:xdigit:]]*/background	= ${colors[16]}/g" ~/.dotfiles/ThinkpadX200s/.config/termite/config
-    sed -i "s/color12 = #[[:xdigit:]]*/color12 = ${colors[17]}/g" ~/.dotfiles/ThinkpadX200s/.config/termite/config
+    sed -i "s/background	= #[[:xdigit:]]*/background	= ${colors[16]}/g" ~/.dotfiles/BitfenixNeos/.config/termite/config
+    sed -i "s/color12 = #[[:xdigit:]]*/color12 = ${colors[17]}/g" ~/.dotfiles/BitfenixNeos/.config/termite/config
     
-    sed -i "s/    background = \"#[[:xdigit:]]*\"/    background = \"${colors[18]}\"/g" ~/.dotfiles/ThinkpadX200s/.config/dunst/dunstrc
-    sed -i "s/    foreground = \"#[[:xdigit:]]*\"/    foreground = \"${colors[19]}\"/g" ~/.dotfiles/ThinkpadX200s/.config/dunst/dunstrc
-
-    sed -i "s/ gradient_color_1 = '#[[:xdigit:]]*'/ gradient_color_1 = '${colors[20]}'/g" ~/.dotfiles/ThinkpadX200s/.config/cava/config
-    sed -i "s/ gradient_color_2 = '#[[:xdigit:]]*'/ gradient_color_2 = '${colors[21]}'/g" ~/.dotfiles/ThinkpadX200s/.config/cava/config
+    sed -i "s/    background = \"#[[:xdigit:]]*\"/    background = \"${colors[18]}\"/g" ~/.dotfiles/BitfenixNeos/.config/dunst/dunstrc
+    sed -i "s/    foreground = \"#[[:xdigit:]]*\"/    foreground = \"${colors[19]}\"/g" ~/.dotfiles/BitfenixNeos/.config/dunst/dunstrc
 
     # Firefox Border, Firefox Background, Fonts
-    sed -i "s/    --grey-50: #[[:xdigit:]]*;/    --grey-50: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
-    sed -i "s/    --grey-70: #[[:xdigit:]]*;/    --grey-70: ${colors[23]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
-    sed -i "s/    --grey-30: #[[:xdigit:]]*;/    --grey-30: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
-    sed -i "s/    --grey-40: #[[:xdigit:]]*;/    --grey-40: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
-    sed -i "s/    --grey-60: #[[:xdigit:]]*;/    --grey-60: ${colors[24]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-50: #[[:xdigit:]]*;/    --grey-50: ${colors[20]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-70: #[[:xdigit:]]*;/    --grey-70: ${colors[21]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-30: #[[:xdigit:]]*;/    --grey-30: ${colors[20]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-40: #[[:xdigit:]]*;/    --grey-40: ${colors[20]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
+    sed -i "s/    --grey-60: #[[:xdigit:]]*;/    --grey-60: ${colors[22]};/g" ~/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css
 
     # GTK
     GTK_COLORS=`cat "$HOME/.themes/custom/gtk-3.0/gtk.css" | head -n4 | tail -n3`
     GTK_COLOR1=`echo $GTK_COLORS | cut -d' ' -f1`
     GTK_COLOR2=`echo $GTK_COLORS | cut -d' ' -f2`
     GTK_COLOR3=`echo $GTK_COLORS | cut -d' ' -f3`
-    sed -i "s/$GTK_COLOR1/${colors[25]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
-    sed -i "s/$GTK_COLOR2/${colors[26]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
-    sed -i "s/$GTK_COLOR3/${colors[27]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
+    sed -i "s/$GTK_COLOR1/${colors[23]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
+    sed -i "s/$GTK_COLOR2/${colors[24]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
+    sed -i "s/$GTK_COLOR3/${colors[25]}/g" "$HOME/.themes/custom/gtk-3.0/gtk.css"
 }
 
 if [[ "$1" == ~/Pictures/Wallpapers/glider.jpg ]]; then
@@ -70,8 +67,6 @@ if [[ "$1" == ~/Pictures/Wallpapers/glider.jpg ]]; then
     colors+=("#81A2BE") # termite foreground
     colors+=("#12151A") # dunst background
     colors+=("#FFFFFF") # dunst foreground
-    colors+=("#404040") # cava color1
-    colors+=("#AAAAAA") # cava color2
     colors+=("#81A2BE") # firefox 1
     colors+=("#12151A") # firefox 2
     colors+=("#555555") # firefox 3
@@ -106,8 +101,6 @@ elif [[ "$1" == ~/Pictures/Wallpapers/rainy-day.png ]]; then
     colors+=("#D0A9C2") # termite foreground
     colors+=("#323A33") # dunst background
     colors+=("#D0A9C2") # dunst foreground
-    colors+=("#323A33") # cava color1
-    colors+=("#D0A9C2") # cava color2
     colors+=("#D0A9C2") # firefox 1
     colors+=("#323A33") # firefox 2
     colors+=("#4F5E52") # firefox 3
@@ -152,8 +145,6 @@ elif [ ! -z "$1" ]; then
 	colors+=("${picked_colors[0]}")
 	colors+=("${picked_colors[$length]}")
 	colors+=("${picked_colors[0]}")
-	colors+=("${picked_colors[$length]}")
-	colors+=("${picked_colors[1]}")
 	colors+=("${picked_colors[$length]}")
 	colors+=("${picked_colors[$length]}")
 	colors+=("${picked_colors[0]}")

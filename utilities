@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export SUDO_ASKPASS=`which password`
+
 function notify(){
     if [[ "$#" -eq 0 ]]; then
 	notify-send -r 1 -u low 'Swipe your finger'
@@ -11,11 +13,6 @@ function notify(){
 	fi
     fi
 }
-
-#function menu(){
-#    sleep .2
-#    printf "$2" | dmenu -i -sb "$COLOR1" -p "$1"
-#}
 
 function menu(){
     sleep .2
