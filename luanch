@@ -71,7 +71,7 @@ function control_panel(){
 	"")
 	    rfkill unblock wifi &&
 		sudo -A ip link set wlp0s26u1u6 up &&
-		sudo -A wpa_supplicant -B -c /foobar.conf -i wlp0s26u1u6 &&
+		sudo -A wpa_supplicant -B -c /etc/wpa_supplicant/wpa_supplicant.conf -i wlp0s26u1u6 &&
 		sudo -A dhcpcd &&
 		notify 'Wifi enabled';;
 	"")
