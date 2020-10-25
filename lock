@@ -38,7 +38,11 @@ i3lock -t -i "$TMPBG" \
     --insidevercolor=$insidevercolor --veriftext='' --ringwrongcolor=$ringwrongcolor \
     --insidewrongcolor=$insidewrongcolor --wrongtext='' --keyhlcolor=$keyhlcolor \
     --bshlcolor=$bshlcolor --noinputtext='' \
-    --screen=1
+    --screen=1 \
+    --pass-media-keys \
+    --pass-screen-keys \
+    --pass-power-keys \
+    --pass-volume-keys
 
 rm "$TMPBG"
 

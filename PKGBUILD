@@ -9,6 +9,7 @@ license=('GPL')
 depends=(
     'dmenu'
     'nmap'
+    'openresolv'
     'aircrack-ng'
     'awk'
     'grep'

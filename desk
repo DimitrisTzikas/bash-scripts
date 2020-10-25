@@ -1,14 +1,75 @@
 #!/bin/bash
 
+source utilities
+
+function request {
+    par_on="?comRelay""$num""=on"
+    par_off="?comRelay""$num""=off"
+    if (curl 192.168.123.200 | grep -e "$par_on") >/dev/null; then
+	(curl 192.168.123.200/"$par_on") >/dev/null &&
+	    notify "$device"": off"
+    elif (curl 192.168.123.200 | grep -e "$par_off") >/dev/null; then
+	(curl 192.168.123.200/"$par_off") >/dev/null &&
+	    notify "$device"": on"
+    else
+	notify "$device"": Not found"
+    fi
+}
+
 if [[ "$#" -ne 1 ]]; then
     echo "Too many arguments or none" 1>&2
     exit 1
 else
     case "$1" in
-	[rR] | [rR][aA][dD][iI][oO]) (curl 192.168.123.200 | grep -e '?comRelay1=on' && curl 192.168.123.200/?comRelay1=on || curl 192.168.123.200/?comRelay1=off) >/dev/null 2>/dev/null;;
-	[mM] | [mM][oO][nN][iI][tT][oO][rR]) (curl 192.168.123.200 | grep -e '?comRelay2=on' && curl 192.168.123.200/?comRelay2=on || curl 192.168.123.200/?comRelay2=off) >/dev/null 2>/dev/null;;
-	[lL] | [lL][iI][gG][hH][tT]) (curl 192.168.123.200 | grep -e '?comRelay3=on' && curl 192.168.123.200/?comRelay3=on || curl 192.168.123.200/?comRelay3=off) >/dev/null 2>/dev/null;;
-	[bB][lL] | [bB][aA][cC][kK][lL][iI][gG][hH][tT]) (curl 192.168.123.200 | grep -e '?comRelay4=on' && curl 192.168.123.200/?comRelay4=on || curl 192.168.123.200/?comRelay4=off) >/dev/null 2>/dev/null;;
+	[rR] | [rR][aA][dD][iI][oO])
+	    num=3
+	    device="Radio"
+	    request;;
+	[mM] | [mM][oO][nN][iI][tT][oO][rR])
+	    num=2
+	    device="Plug"
+	    request;;
+	[lL] | [lL][iI][gG][hH][tT])
+	    num=1
+	    device="Light"
+	    request;;
+	[bB][lL] | [bB][aA][cC][kK][lL][iI][gG][hH][tT])
+	    num=4
+	    device="Background Light"
+	    request;;
+	[sS] | [sS][tT][aA][tT][uU][sS])
+	    if curl 192.168.123.200 | grep -e '?comRelay3=on'; then
+		message="Radio: on"
+	    elif curl 192.168.123.200 | grep -e '?comRelay3=off'; then
+		message="Radio: off"
+	    else
+		message="Radio: not found"
+	    fi
+	    notify "no-id" "$message"
+	    if curl 192.168.123.200 | grep -e '?comRelay2=on'; then
+		message="Plug: on"
+	    elif curl 192.168.123.200 | grep -e '?comRelay2=off'; then
+		message="Plug: off"
+	    else
+		message="Plug: not found"
+	    fi
+	    notify "no-id" "$message"
+	    if curl 192.168.123.200 | grep -e '?comRelay1=on'; then
+		message="Light: on"
+	    elif curl 192.168.123.200 | grep -e '?comRelay1=off'; then
+		message="Light: off"
+	    else
+		message="Light: not found"
+	    fi
+	    notify "no-id" "$message"
+	    if curl 192.168.123.200 | grep -e '?comRelay4=on'; then
+		message="Background Light: on"
+	    elif curl 192.168.123.200 | grep -e '?comRelay4=off'; then
+		message="Background Light: off"
+	    else
+		message="Background Light: not found"
+	    fi
+	    notify "no-id" "$message";;
 	*) echo "Not valid argument" 1>&2
 	   exit 1;;
     esac
