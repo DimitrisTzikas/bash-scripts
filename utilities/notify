@@ -1,0 +1,28 @@
+#!/bin/sh
+
+help="Usage: notify [OPTION] [STRING]
+Send notifications (notifycation-send, libnotify-id)
+
+Options:
+	-h help
+	-no-id send notification without id"
+
+case "$#" in
+    1)
+	if [[ "$1" == "-help" || "$1" == "-h" ]]; then
+	    echo "$help"
+	else
+	    notify-send -r 1 -u low "$1"
+	fi;;
+    2)
+	if [[ "$1" == "-no-id" ]]; then
+	    notify-send -u low "$2"
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    *)
+	echo "error: no arguments or too many arguments" 1>&2
+	exit 1;;
+esac
+

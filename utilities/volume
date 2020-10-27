@@ -1,0 +1,51 @@
+#!/bin/sh
+
+help="Usage: volume [OPTION]
+Volume controller (PulseAudio)
+
+Options:
+	-h help
+	-i increase volume
+	-d decrease volume
+	-t toggle mute"
+
+sink="$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)"
+
+if [[ "$#" -ne 1 ]]; then
+    echo "error: no arguments or too many arguments" 1>&2
+    exit 1
+elif [[ `pgrep volume | wc -l` != '2' ]]; then
+    echo "error: volume already running" 1>&2
+    exit 1
+elif [[ "$sink" == "" ]]; then
+    echo "error: sink not found" 1>&2
+    exit 1
+fi
+
+case "$1" in
+    '-h')
+	echo "$help";;
+    '-i')
+	pactl set-sink-mute "$sink" false
+	if [[ "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)" -lt 100 ]]; then
+	    pactl set-sink-volume "$sink" +5%
+	    pactl set-sink-volume "$sink" $(( ($(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)+2)/5*5 ))%
+	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	fi;;
+    '-d')
+	pactl set-sink-mute "$sink" false
+	    pactl set-sink-volume "$sink" -5%
+	    pactl set-sink-volume "$sink" $(( ($(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)+2)/5*5 ))%
+	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)";;
+    '-t')
+	pactl set-sink-mute "$sink" toggle
+	if amixer get Master | grep -Fq '[off]'; then
+	    notify "Muted"
+	else
+	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	fi;;
+    *)
+	echo "error: not valid argument" 1>&2
+	exit 1;;
+esac
+

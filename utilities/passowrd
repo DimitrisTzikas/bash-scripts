@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rofi -theme apps.rasi -dmenu -password -p Password:
+

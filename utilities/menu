@@ -1,0 +1,46 @@
+#!/bin/sh
+
+help="Usage: menu [OPTION...] [STRING]
+Create a simple menu (rofi)
+
+Options:
+	-h help
+	-yn yes or no question
+
+Themes:
+	apps
+	entry
+	menu
+	panel
+
+Example:
+	menu panel question \"option1\\noption2\""
+
+#TODO changed it to something else
+sleep .2
+
+case "$#" in
+    1)
+	if [[ "$1" == "-help" || "$1" == "-h" ]]; then
+	    echo "$help"
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    2)
+	if [[ "$1" == "-yn" ]]; then
+	    ans=`printf 'No\nYes' | rofi -theme entry -p "$2" -dmenu -i`
+	    if [[ "$ans" != "Yes" ]]; then
+		exit 1;
+	    fi
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    3)
+	printf "$3" | rofi -theme ~/.config/rofi/"$1" -p "$2" -dmenu -i;;
+    *)
+	echo "error: no arguments or too many arguments" 1>&2
+	exit 1;;
+esac
+
