@@ -5,9 +5,11 @@ Change wallpaper and color scheme
 
 Options:
 	-h help
+	-l list themes
+	-c check config files for errors
 	-t theme"
 CONFIG_DIR="$HOME/.dotfiles/BitfenixNeos/"
-GTK_DIR="$HOME/.themes/custom/gtk-3.0/gtk.css"
+GTK_CSS="$HOME/.themes/custom/gtk-3.0/gtk.css"
 FIREFOX_CSS_FILE="$HOME/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css"
 THEME_FILE="$HOME/.themes/themes"
 DEFAULT_THEME_FILEX="themeName{
@@ -242,7 +244,7 @@ function changeColors {
 	"$FIREFOX_CSS_FILE"
     
     # GTK colors
-    local GTK_COLORS="$(cat "$HOME/.themes/custom/gtk-3.0/gtk.css" | head -n5 | tail -n4)"
+    local GTK_COLORS="$(cat "$GTK_CSS" | head -n5 | tail -n4)"
     local GTK_COLOR1="$(echo $GTK_COLORS | cut -d' ' -f1)"
     local GTK_COLOR2="$(echo $GTK_COLORS | cut -d' ' -f2)"
     local GTK_COLOR3="$(echo $GTK_COLORS | cut -d' ' -f3)"
@@ -251,28 +253,112 @@ function changeColors {
     
     sed -i \
 	"s/$GTK_COLOR1/${colors[21]}/g" \
-	"$GTK_DIR"
+	"$GTK_CSS"
     sed -i \
 	"s/$GTK_COLOR2/${colors[22]}/g" \
-	"$GTK_DIR"
+	"$GTK_CSS"
     sed -i \
 	"s/$GTK_COLOR3/${colors[23]}/g" \
-	"$GTK_DIR"
+	"$GTK_CSS"
     sed -i \
 	"s/$GTK_COLOR4/$gtkColor3RGBA/g" \
-	"$GTK_DIR"
+	"$GTK_CSS"
 }
 
 function checkColorValues {
-    # TODO
-    echo k
+    # Xmonad
+    if cat "$CONFIG_DIR/.xmonad/xmonad.hs" | grep "myFocusedBorderColor \+\= \"#[[:xdigit:]]\{6\}\"" >/dev/null &&
+	    cat "$CONFIG_DIR/.xmonad/xmonad.hs" | grep "myNormalBorderColor \+\= \"#[[:xdigit:]]\{6\}\"" >/dev/null &&
+	    cat "$CONFIG_DIR/.xmonad/xmonad.hs" | grep "myHiddenNoWindowsColor \+\= \"#[[:xdigit:]]\{6\}\"" >/dev/null &&
+	    cat "$CONFIG_DIR/.xmonad/xmonad.hs" | grep "myNonEmptyColor \+\= \"#[[:xdigit:]]\{6\}\"" >/dev/null &&
+	    cat "$CONFIG_DIR/.xmonad/xmonad.hs" | grep "myCurrentColor \+\= \"#[[:xdigit:]]\{6\}\"" >/dev/null; then
+	echo "Xmonad: OK"
+    else
+	echo "Xmonad: ERROR"
+    fi
+    
+    # Xmobar
+    if cat "$CONFIG_DIR/.xmonad/xmobar.conf" | grep ", bgColor = \"#[[:xdigit:]]\{6\}\"" >/dev/null &&
+	    cat "$CONFIG_DIR/.xmonad/xmobar.conf" | grep ", fgColor = \"#[[:xdigit:]]\{6\}\"" >/dev/null; then
+	echo "Xmobar: OK"
+    else
+	echo "Xmobar: ERROR"
+    fi
+
+    # Stalonetray
+    if cat "$CONFIG_DIR/.stalonetrayrc" | grep "background \"#[[:xdigit:]]\{6\}\"" >/dev/null; then
+	echo "Stalonetray: OK"
+    else
+	echo "Stalonetray: ERROR"
+    fi
+
+    # Rofi
+    if cat "$CONFIG_DIR/.config/rofi/colors.rasi" | grep "accent: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/rofi/colors.rasi" | grep "background: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/rofi/colors.rasi" | grep "background-light: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/rofi/colors.rasi" | grep "background-focus: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/rofi/colors.rasi" | grep "foreground: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/rofi/colors.rasi" | grep "foreground-list: #[[:xdigit:]]\{6\}" >/dev/null; then
+	echo "Rofi: OK"
+    else
+	echo "Rofi: ERROR"
+    fi
+
+    # Termite
+    if cat "$CONFIG_DIR/.config/termite/config" | grep "background	= rgba([[:digit:]]\{1,3\}, [[:digit:]]\{1,3\}, [[:digit:]]\{1,3\}, [[:digit:]]\.[[:digit:]]\{1,2\})" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/termite/config" | grep "color12 = #[[:xdigit:]]\{6\}" >/dev/null; then
+	echo "Termite: OK"
+    else
+	echo "Termite: ERROR"
+    fi
+
+    # Alacritty
+    if cat "$CONFIG_DIR/.config/alacritty/alacritty.yml" | grep "background: '#[[:xdigit:]]\{6\}'" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/alacritty/alacritty.yml" | grep "foreground: '#[[:xdigit:]]\{6\}'" >/dev/null; then
+	echo "Alacritty: OK"
+    else
+	echo "Alacritty: ERROR"
+    fi
+
+    # Dunst
+    if cat "$CONFIG_DIR/.config/dunst/dunstrc" | grep "background = \"#[[:xdigit:]]\{6\}\"" >/dev/null &&
+	    cat "$CONFIG_DIR/.config/dunst/dunstrc" | grep "foreground = \"#[[:xdigit:]]\{6\}\"" >/dev/null; then
+	echo "Dunst: OK"
+    else
+	echo "Dunst: ERROR"
+    fi
+
+    # Firefox
+    if cat "$FIREFOX_CSS_FILE" | grep "grey-50: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$FIREFOX_CSS_FILE" | grep "grey-70: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$FIREFOX_CSS_FILE" | grep "grey-30: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$FIREFOX_CSS_FILE" | grep "grey-40: #[[:xdigit:]]\{6\}" >/dev/null &&
+	    cat "$FIREFOX_CSS_FILE" | grep "grey-60: #[[:xdigit:]]\{6\}" >/dev/null; then
+	echo "Firefox: OK"
+    else
+	echo "Firefox: ERROR"
+    fi
+
+    # GTK
+    local GTK_COLORS="$(cat "$GTK_CSS" | head -n5 | tail -n4)"
+    if echo $GTK_COLORS | cut -d' ' -f1 | grep "#[[:xdigit:]]\{6\}" >/dev/null &&
+	    echo $GTK_COLORS | cut -d' ' -f2 | grep "#[[:xdigit:]]\{6\}" >/dev/null &&
+	    echo $GTK_COLORS | cut -d' ' -f3 | grep "#[[:xdigit:]]\{6\}" >/dev/null &&
+	    echo $GTK_COLORS | cut -d' ' -f4-7 | grep "rgba([[:digit:]]\{1,3\}, [[:digit:]]\{1,3\}, [[:digit:]]\{1,3\}, [[:digit:]]\.[[:digit:]]\{1,2\})" >/dev/null; then
+	echo "GTK: OK"
+    else
+	echo "GTK: ERROR"
+    fi
 }
 
-set -e
 case "$#" in
     1)
 	if [ "$1" == "-h" ]; then
 	    echo "$help"
+	elif [ "$1" == "-l" ]; then
+	    cat "$THEME_FILE" | grep "{" | cut -d"{" -f1
+	elif [ "$1" == "-c" ]; then
+	    checkColorValues
 	elif [ -f "$1" ]; then
 	    wallpaper="$1"
 	    colorExtractor "$wallpaper"
@@ -285,7 +371,7 @@ case "$#" in
 	    exit 1
 	fi;;
     2)
-	if [ "--theme" == "$1" ]; then
+	if [ "-t" == "$1" ]; then
 	    colorLoader "$2"
 	    evaluateColors ${colors[@]}
 	    changeColors ${colors[@]}
