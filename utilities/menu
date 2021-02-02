@@ -29,7 +29,7 @@ case "$#" in
 	fi;;
     2)
 	if [[ "$1" == "-yn" ]]; then
-	    ans=`printf 'No\nYes' | rofi -theme entry -p "$2" -dmenu -i`
+	    ans=`printf 'No\nYes' | rofi -theme question -p "$2" -dmenu -i`
 	    if [[ "$ans" != "Yes" ]]; then
 		exit 1;
 	    fi

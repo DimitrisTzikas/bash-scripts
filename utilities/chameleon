@@ -1,0 +1,302 @@
+#!/bin/sh
+
+help="Usage: chameleon [OPTION]
+Change wallpaper and color scheme
+
+Options:
+	-h help
+	-t theme"
+CONFIG_DIR="$HOME/.dotfiles/BitfenixNeos/"
+GTK_DIR="$HOME/.themes/custom/gtk-3.0/gtk.css"
+FIREFOX_CSS_FILE="$HOME/.mozilla/firefox/pj53kw8h.Main/chrome/userContent.css"
+THEME_FILE="$HOME/.themes/themes"
+DEFAULT_THEME_FILEX="themeName{
+themeName-wallpaper: /home/dimitris/Pictures/Wallpapers/fuji.jpg
+themeName-xmonadFocusedBorderColor: #000000
+themeName-xmonadNormalBorderColor: #000000
+themeName-xmonadEmptyColor: #000000
+themeName-xmonadNonEmptyColor: #000000
+themeName-xmonadCurrentColor: #000000
+themeName-xmobarBGColor: #000000
+themeName-xmobarFGColor: #000000
+themeName-stalonetrayColor: #000000
+themeName-rofiAccentColor: #000000
+themeName-rofiBGColor: #000000
+themeName-rofiBGLightColor: #000000
+themeName-rofiBGFocusColor: #000000
+themeName-rofiFGColor: #000000
+themeName-rofiFGListColor: #000000
+themeName-terminalBGColor: #000000
+themeName-terminalFGColor: #000000
+themeName-dunstBGColor: #000000
+themeName-dunstFGColor: #000000
+themeName-firefoxColor1: #000000
+themeName-firefoxColor2: #000000
+themeName-firefoxColor3: #000000
+themeName-gtkColor1: #000000
+themeName-gtkColor2: #000000
+themeName-gtkColor3: #000000
+}"
+
+function restartWM {
+    feh --bg-fill "$wallpaper"
+    pkill stalonetray &&
+	pkill xmobar &&
+	xmonad --restart
+}
+
+function hexToRGBA {
+    local R=$(echo "obase=10; ibase=16; $(echo $1 | cut -b2-3)" | bc)
+    local G=$(echo "obase=10; ibase=16; $(echo $1 | cut -b4-5)" | bc)
+    local B=$(echo "obase=10; ibase=16; $(echo $1 | cut -b6-7)" | bc)
+    local A="$2"
+    echo "rgba($R, $G, $B, $A)"
+}
+
+function evaluateColors {
+    if [ "$#" == 0 ]; then
+	echo "error: no colors found" 1>&2
+	exit 1;
+    fi
+    for color in "$@" ; do
+	if [[ ! "$color" =~ ^#[[:xdigit:]]{6}$ ]]; then
+	    echo "error: invalid hex color: $color" 1>&2
+	    exit 1
+	fi
+    done
+}
+
+function colorExtractor {
+    colors=$(convert "$1" -geometry 16x16 -colors 8 -unique-colors txt:- |
+	grep '#[[:xdigit:]]\{6\}' |
+	cut -d' ' -f4)
+
+    local color
+    for color in $colors; do
+	local picked_colors+=("$color")
+    done
+
+    local length=$((${#picked_colors[@]}-1))
+    if [ ${#picked_colors[@]} -ge 3 ]; then
+	colors=("${picked_colors[1]}") #xmonadFocusedBorderColor
+	colors+=("${picked_colors[0]}") #xmonadNormalBorderColor
+	colors+=("${picked_colors[1]}") #xmonadEmptyColor
+	colors+=("${picked_colors[0]}") #xmonadNonEmptyColor
+	colors+=("${picked_colors[$length]}") #xmonadCurrentColor
+	colors+=("${picked_colors[0]}") #xmobarBGColor
+	colors+=("${picked_colors[$length]}") #xmobarFGColor
+	colors+=("${picked_colors[0]}") #stalonetrayColor
+	colors+=("${picked_colors[$length]}") #rofiAccentColor
+	colors+=("${picked_colors[0]}") #rofiBGColor
+	colors+=("${picked_colors[1]}") #rofiBGLightColor
+	colors+=("${picked_colors[2]}") #rofiBGFocusColor
+	colors+=("${picked_colors[3]}") #rofiFGColor
+	colors+=("${picked_colors[3]}") #rofiFGListColor
+	colors+=("${picked_colors[0]}") #terminalBGColor
+	colors+=("${picked_colors[3]}") #terminalFGColor
+	colors+=("${picked_colors[0]}") #dunstBGColor
+	colors+=("${picked_colors[$length]}") #dunstFGColor
+	colors+=("${picked_colors[$length]}") #firefoxColor1
+	colors+=("${picked_colors[0]}") #firefoxColor2
+	colors+=("${picked_colors[2]}") #firefoxColor3
+	colors+=("${picked_colors[0]}") #gtkColor1
+	colors+=("${picked_colors[$length]}") #gtkColor2
+	colors+=("${picked_colors[2]}") #gtkColor3
+    else
+	echo "error: not enough colors to extract" 1>&2
+	exit 1
+    fi
+}
+
+function colorLoader {
+    if [ -f "$THEME_FILE" ]; then
+	if cat "$THEME_FILE" | grep "^$1{" >/dev/null; then
+	    wallpaper="$(cat "$THEME_FILE" | grep "$1-wallpaper:" | cut -d' ' -f2)"
+	    colors=("$(cat "$THEME_FILE" | grep "$1-xmonadFocusedBorderColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-xmonadNormalBorderColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-xmonadEmptyColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-xmonadNonEmptyColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-xmonadCurrentColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-xmobarBGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-xmobarFGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-stalonetrayColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-rofiAccentColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-rofiBGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-rofiBGLightColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-rofiBGFocusColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-rofiFGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-rofiFGListColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-terminalBGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-terminalFGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-dunstBGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-dunstFGColor" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-firefoxColor1" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-firefoxColor2" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-firefoxColor3" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-gtkColor1" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-gtkColor2" | cut -d: -f2)")
+	    colors+=("$(cat "$THEME_FILE" | grep "$1-gtkColor3" | cut -d: -f2)")
+	else
+	    echo "error: no theme found with name: $1" 1>&2
+	    exit 1
+	fi
+    else
+	echo "error: file not found... Creating new file."
+	echo "$DEFAULT_THEME_FILEX" > "$THEME_FILE"
+	exit 0
+    fi
+}
+
+function changeColors {
+    local colors=( "$@" )
+    # Xmonad colors
+    sed -i \
+	"s/myFocusedBorderColor   = \"#[[:xdigit:]]*\"/myFocusedBorderColor   = \"${colors[0]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmonad.hs"
+    sed -i \
+	"s/myNormalBorderColor    = \"#[[:xdigit:]]*\"/myNormalBorderColor    = \"${colors[1]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmonad.hs"
+    sed -i \
+	"s/myHiddenNoWindowsColor = \"#[[:xdigit:]]*\"/myHiddenNoWindowsColor = \"${colors[2]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmonad.hs"
+    sed -i \
+	"s/myNonEmptyColor        = \"#[[:xdigit:]]*\"/myNonEmptyColor        = \"${colors[3]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmonad.hs"
+    sed -i \
+	"s/myCurrentColor         = \"#[[:xdigit:]]*\"/myCurrentColor         = \"${colors[4]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmonad.hs"
+
+    # Xmobar colors
+    sed -i \
+	"s/, bgColor = \"#[[:xdigit:]]*\"/, bgColor = \"${colors[5]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmobar.conf"
+    sed -i \
+	"s/, fgColor = \"#[[:xdigit:]]*\"/, fgColor = \"${colors[6]}\"/g" \
+	"$CONFIG_DIR/.xmonad/xmobar.conf"
+
+    # Stalonetray colors
+    sed -i \
+	"s/background \"#[[:xdigit:]]*\"/background \"${colors[7]}\"/g" \
+	"$CONFIG_DIR/.stalonetrayrc"
+    
+    # Rofi colors
+    sed -i \
+	"s/accent: #[[:xdigit:]]*;/accent: ${colors[8]};/g" \
+	"$CONFIG_DIR/.config/rofi/colors.rasi"
+    sed -i \
+	"s/background: #[[:xdigit:]]*;/background: ${colors[9]};/g" \
+	"$CONFIG_DIR/.config/rofi/colors.rasi"
+    sed -i \
+	"s/background-light: #[[:xdigit:]]*;/background-light: ${colors[10]};/g" \
+	"$CONFIG_DIR/.config/rofi/colors.rasi"
+    sed -i \
+	"s/background-focus: #[[:xdigit:]]*;/background-focus: ${colors[11]};/g" \
+	"$CONFIG_DIR/.config/rofi/colors.rasi"
+    sed -i \
+	"s/foreground: #[[:xdigit:]]*;/foreground: ${colors[12]};/g" \
+	"$CONFIG_DIR/.config/rofi/colors.rasi"
+    sed -i \
+	"s/foreground-list: #[[:xdigit:]]*;/foreground-list: ${colors[13]};/g" \
+	"$CONFIG_DIR/.config/rofi/colors.rasi"
+
+    # Termite colors
+    local terminalBGColorRGBA="$(hexToRGBA ${colors[14]} 0.8)"
+    sed -i \
+	"s/background	= rgba(.*)/background	= $terminalBGColorRGBA/g" \
+	"$CONFIG_DIR/.config/termite/config"
+    sed -i \
+	"s/color12 = #[[:xdigit:]]*/color12 = ${colors[15]}/g" \
+	"$CONFIG_DIR/.config/termite/config"
+
+    # Alacritty colors
+    sed -i \
+	"s/background: '#[[:xdigit:]]*'/background: '${colors[14]}'/g" \
+	"$CONFIG_DIR/.config/alacritty/alacritty.yml"
+    sed -i \
+	"s/foreground: '#[[:xdigit:]]*'/foreground: '${colors[15]}'/g" \
+	"$CONFIG_DIR/.config/alacritty/alacritty.yml"
+    
+    # Dunst colors
+    sed -i \
+	"s/    background = \"#[[:xdigit:]]*\"/    background = \"${colors[16]}\"/g" \
+	"$CONFIG_DIR/.config/dunst/dunstrc"
+    sed -i \
+	"s/    foreground = \"#[[:xdigit:]]*\"/    foreground = \"${colors[17]}\"/g" \
+	"$CONFIG_DIR/.config/dunst/dunstrc"
+
+    # Firefox colors
+    sed -i \
+	"s/    --grey-50: #[[:xdigit:]]*;/    --grey-50: ${colors[18]};/g" \
+	"$FIREFOX_CSS_FILE"
+    sed -i \
+	"s/    --grey-70: #[[:xdigit:]]*;/    --grey-70: ${colors[19]};/g" \
+	"$FIREFOX_CSS_FILE"
+    sed -i \
+	"s/    --grey-30: #[[:xdigit:]]*;/    --grey-30: ${colors[18]};/g" \
+	"$FIREFOX_CSS_FILE"
+    sed -i \
+	"s/    --grey-40: #[[:xdigit:]]*;/    --grey-40: ${colors[18]};/g" \
+	"$FIREFOX_CSS_FILE"
+    sed -i \
+	"s/    --grey-60: #[[:xdigit:]]*;/    --grey-60: ${colors[20]};/g" \
+	"$FIREFOX_CSS_FILE"
+    
+    # GTK colors
+    local GTK_COLORS="$(cat "$HOME/.themes/custom/gtk-3.0/gtk.css" | head -n5 | tail -n4)"
+    local GTK_COLOR1="$(echo $GTK_COLORS | cut -d' ' -f1)"
+    local GTK_COLOR2="$(echo $GTK_COLORS | cut -d' ' -f2)"
+    local GTK_COLOR3="$(echo $GTK_COLORS | cut -d' ' -f3)"
+    local GTK_COLOR4="$(echo $GTK_COLORS | cut -d' ' -f4-7)"
+    local gtkColor3RGBA="$(hexToRGBA ${colors[23]} 0.5)"
+    
+    sed -i \
+	"s/$GTK_COLOR1/${colors[21]}/g" \
+	"$GTK_DIR"
+    sed -i \
+	"s/$GTK_COLOR2/${colors[22]}/g" \
+	"$GTK_DIR"
+    sed -i \
+	"s/$GTK_COLOR3/${colors[23]}/g" \
+	"$GTK_DIR"
+    sed -i \
+	"s/$GTK_COLOR4/$gtkColor3RGBA/g" \
+	"$GTK_DIR"
+}
+
+function checkColorValues {
+    # TODO
+    echo k
+}
+
+set -e
+case "$#" in
+    1)
+	if [ "$1" == "-h" ]; then
+	    echo "$help"
+	elif [ -f "$1" ]; then
+	    wallpaper="$1"
+	    colorExtractor "$wallpaper"
+	    evaluateColors ${colors[@]}
+	    changeColors ${colors[@]}
+	    restartWM
+	    notify -no-id "Chameleon" "Color theme changed"
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    2)
+	if [ "--theme" == "$1" ]; then
+	    colorLoader "$2"
+	    evaluateColors ${colors[@]}
+	    changeColors ${colors[@]}
+	    restartWM
+	    notify -no-id "Chameleon" "Color theme changed"
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    *)
+	echo "error: no arguments or too many arguments" 1>&2
+	exit 1;;
+esac
+

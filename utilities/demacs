@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export LC_CTYPE=ja_JP.UTF-8
+(emacsclient -e '(kill-emacs)' &&
+     notify 'Emacs Daemon' 'Disabled') ||
+    (emacs --daemon &&
+	 notify 'Emacs Daemon' 'Enabled')

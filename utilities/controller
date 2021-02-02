@@ -1,0 +1,122 @@
+#!/bin/sh
+
+help="Usage: controller [OPTION]
+Control switches
+
+Options:
+	-h help"
+
+DEVICE_IP="192.168.123.200"
+
+function turnOn {
+    (curl "$DEVICE_IP"/"?comRelay""$switch""=off") >/dev/null &&
+	notify "Controller" "$device"": on"
+}
+
+function turnOff {
+    (curl "$DEVICE_IP"/"?comRelay""$switch""=on") >/dev/null &&
+	notify "Controller" "$device"": off"
+}
+
+function toggle {
+    stats="$(curl $DEVICE_IP)"
+    if (echo $stats | grep "?comRelay""$switch""=off"); then
+	turnOn
+    elif (echo $stats | grep "?comRelay""$switch""=on"); then
+	turnOff
+    fi
+}
+
+function setState {
+    if [[ "$state" == "on" ]]; then
+	(curl "$DEVICE_IP"/"?comRelay""$switch""=off") >/dev/null
+    else
+	(curl "$DEVICE_IP"/"?comRelay""$switch""=on") >/dev/null
+    fi
+}
+
+function status {
+    stats="$(curl $DEVICE_IP)"
+    if (echo $stats | grep "?comRelay""$switch""=off"); then
+	message="$message $device"": off\n"
+    else
+	message="$message $device"": on\n"
+    fi
+}
+
+curl "$DEVICE_IP" >/dev/null 2>/dev/null ||
+if [[ "$?" -ne 0 ]]; then
+    notify "Controller" "Can't find device"
+    echo "error: can't find device" 1>&2
+    exit 1
+fi
+						    
+case "$#" in
+    1)
+	if [[ "$1" == "-help" || "$1" == "-h" ]]; then
+	    echo "$help"
+	else
+	    case "$1" in
+		s | speakers)
+		    switch=3
+		    device="Speakers"
+		    toggle;;
+		p | plug)
+		    switch=2
+		    device="Plug"
+		    toggle;;
+		l | light)
+		    switch=1
+		    device="Light"
+		    toggle;;
+		b | backgroundlight)
+		    switch=4
+		    device="Background Light"
+		    toggle;;
+		status)
+		    message=""
+		    switch=3
+		    device="Speakers"
+		    status
+		    switch=2
+		    device="Plug"
+		    status
+		    switch=1
+		    device="Light"
+		    status
+		    switch=4
+		    device="Background Light"
+		    status
+		    notify -no-id "Controller" "$message"
+	    esac
+	fi;;
+    2)
+	if [[ "$2" == "on" || "$2" == "off" ]]; then
+	    state="$2"
+            case "$1" in
+		s | speakers)
+		    switch=3
+		    device="Speakers"
+		    setState;;
+		p | plug)
+		    switch=2
+		    device="Plug"
+		    setState;;
+		l | light)
+		    switch=1
+		    device="Light"
+		    setState;;
+		b | backgroundlight)
+		    switch=3
+		    device="Background Light"
+		    setState;;
+	    esac
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    *)
+	echo "error: no arguments or too many arguments" 1>&2
+	exit 1;;
+esac
+

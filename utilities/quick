@@ -1,0 +1,43 @@
+#!/bin/sh
+
+actions="Social
+Study
+Lock
+Sleep
+Hibernate
+Poweroff"
+
+case $(menu "menu" "Neos" "$actions") in
+    'Social')
+	com.discordapp.Discord &
+	telegram-desktop &;;
+    'Study')
+	pkill Discord
+	pkill telegram-deskto;;
+    'Lock')
+	lock --bg;;
+    'Sleep')
+	if menu -yn 'Sleep'; then
+	    if (curl 192.168.123.200 | grep -e '?comRelay3=on') >/dev/null; then
+		(curl 192.168.123.200/'?comRelay3=on') >/dev/null &&
+		    lock --bg &&
+		    systemctl suspend
+		sleep 1 &&
+		    (curl 192.168.123.200 | grep -e '?comRelay3=off') >/dev/null &&
+		    (curl 192.168.123.200/'?comRelay3=off') >/dev/null
+	    else
+		lock --bg &&
+		    systemctl suspend
+	    fi
+	fi;;
+    'Hibernate')
+	if menu -yn 'Hibernate'; then
+	    lock --bg &&
+		systemctl hibernate
+	fi;;
+    'Poweroff')
+	if menu -yn 'Poweroff'; then
+	    poweroff
+	fi;;
+esac
+

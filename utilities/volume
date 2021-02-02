@@ -7,7 +7,8 @@ Options:
 	-h help
 	-i increase volume
 	-d decrease volume
-	-t toggle mute"
+	-t toggle mute
+	-p change port"
 
 sink="$(pactl info | grep 'Default Sink: ' | cut -d' ' -f3)"
 
@@ -30,19 +31,33 @@ case "$1" in
 	if [[ "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)" -lt 100 ]]; then
 	    pactl set-sink-volume "$sink" +5%
 	    pactl set-sink-volume "$sink" $(( ($(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)+2)/5*5 ))%
-	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
-	fi;;
+	    notify "Audio Volume" "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	fi
+	notify "Audio Volume" "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)";;
     '-d')
 	pactl set-sink-mute "$sink" false
 	    pactl set-sink-volume "$sink" -5%
 	    pactl set-sink-volume "$sink" $(( ($(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)+2)/5*5 ))%
-	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)";;
+	    notify "Audio Volume" "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)";;
     '-t')
 	pactl set-sink-mute "$sink" toggle
 	if amixer get Master | grep -Fq '[off]'; then
-	    notify "Muted"
+	    notify "Audio Volume" "Muted"
 	else
-	    notify "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	    notify "Audio Volume" "$(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+	fi;;
+    '-p')
+	if (pactl list sinks | grep "Active Port: hdmi-output-0") >/dev/null; then
+	    pactl set-card-profile alsa_card.pci-0000_00_1b.0 output:analog-stereo &&
+		pactl set-card-profile alsa_card.pci-0000_01_00.1 off &&
+		notify "Audio Output" "Speakers"
+	    controller speakers on
+	    
+	else
+	    pactl set-card-profile alsa_card.pci-0000_01_00.1 output:hdmi-stereo &&
+		pactl set-card-profile alsa_card.pci-0000_00_1b.0 off &&
+		notify "Audio Output" "Headphones"
+	    controller speakers off
 	fi;;
     *)
 	echo "error: not valid argument" 1>&2

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+help="Usage: rotate [VIDEO_OUTPUT]
+Roate screen (xrandr)
+
+Options:
+	-h help"
+
+if [[ "$#" -ne 1 ]]; then
+    echo "error: no arguments or too many arguments" 1>&2
+    exit 1
+elif [[ "$1" == "-h" ]]; then
+    echo "$help"
+elif xrandr -q | grep $1 | cut -d' ' -f5 | grep normal >/dev/null; then
+    xrandr --output $1 --rotate right
+    "$HOME""/.fehbgr"
+else
+    xrandr --output $1 --rotate normal
+    "$HOME""/.fehbg"
+fi
+
