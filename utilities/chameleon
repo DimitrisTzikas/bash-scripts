@@ -56,8 +56,8 @@ function hexToRGBA {
 }
 
 function evaluateColors {
-    if [ "$#" == 0 ]; then
-	echo "error: no colors found" 1>&2
+    if [ "$#" != 24 ]; then
+	echo "error: not enough colors" 1>&2
 	exit 1;
     fi
     for color in "$@" ; do
@@ -351,6 +351,42 @@ function checkColorValues {
     fi
 }
 
+function exportColors {
+    local param=( "$@" )
+    
+    echo "$1{
+${param[0]}-wallpaper: ${param[1]}
+${param[0]}-xmonadFocusedBorderColor: ${param[2]}
+${param[0]}-xmonadNormalBorderColor: ${param[3]}
+${param[0]}-xmonadEmptyColor: ${param[4]}
+${param[0]}-xmonadNonEmptyColor: ${param[5]}
+${param[0]}-xmonadCurrentColor: ${param[6]}
+${param[0]}-xmobarBGColor: ${param[7]}
+${param[0]}-xmobarFGColor: ${param[8]}
+${param[0]}-stalonetrayColor: ${param[9]}
+${param[0]}-rofiAccentColor: ${param[10]}
+${param[0]}-rofiBGColor: ${param[11]}
+${param[0]}-rofiBGLightColor: ${param[12]}
+${param[0]}-rofiBGFocusColor: ${param[13]}
+${param[0]}-rofiFGColor: ${param[14]}
+${param[0]}-rofiFGListColor: ${param[15]}
+${param[0]}-terminalBGColor: ${param[16]}
+${param[0]}-terminalFGColor: ${param[17]}
+${param[0]}-dunstBGColor: ${param[18]}
+${param[0]}-dunstFGColor: ${param[19]}
+${param[0]}-firefoxColor1: ${param[20]}
+${param[0]}-firefoxColor2: ${param[21]}
+${param[0]}-firefoxColor3: ${param[22]}
+${param[0]}-gtkColor1: ${param[22]}
+${param[0]}-gtkColor2: ${param[23]}
+${param[0]}-gtkColor3: ${param[24]}
+}
+" >> "$THEME_FILE"
+
+    echo "Theme exported!"
+    
+}
+
 case "$#" in
     1)
 	if [ "$1" == "-h" ]; then
@@ -377,6 +413,16 @@ case "$#" in
 	    changeColors ${colors[@]}
 	    restartWM
 	    notify -no-id "Chameleon" "Color theme changed"
+	else
+	    echo "error: not valid argument" 1>&2
+	    exit 1
+	fi;;
+    3)
+	if [[ "-s" == "$1" && -f "$3" ]]; then
+	    wallpaper="$3"
+	    colorExtractor "$wallpaper"
+	    evaluateColors ${colors[@]}
+	    exportColors "$2" "$3" ${colors[@]}
 	else
 	    echo "error: not valid argument" 1>&2
 	    exit 1
