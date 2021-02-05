@@ -1,0 +1,34 @@
+#!/bin/sh
+
+help="Usage: umountm
+Unmount block devices"
+
+export SUDO_ASKPASS=`which password`
+
+if [ "$1" == "-h" ]; then
+    echo "$help"
+    exit 0
+fi
+
+devices="$(lsblk -p | pcregrep -Me 'part.*\n.*crypt|part.{3}' | grep 'part' | awk '{print $1,"("$4")"}' | cut -d/ -f3 | egrep -v 'sda')"
+if [ -z "$devices" ]; then
+    echo "error: no block devices found" 1>&2
+    exit 1
+fi
+
+chosen="$(menu 'entry.rasi' 'Mount' "$devices" | cut -d' ' -f1)"
+if [ -z "$chosen" ]; then
+    echo "error: no block devices chosen" 1>&2
+    exit 1
+fi
+
+if sudo -A blkid | grep "$chosen.*crypto_LUKS" >/dev/null; then
+    chosen="$(lsblk -p | pcregrep -Me "$chosen.*\n.*" | grep -o '/dev/mapper/[^ ]*')"
+    sudo -A umount "$chosen" &&
+	sudo -A cryptsetup close "$(echo "$chosen" | cut -d/ -f4)" &&
+	notify -no-id 'Unmounted' "Device $chosen" 
+else
+    sudo -A umount "/dev/$chosen" &&
+	notify -no-id 'Unmounted' "Device /dev/$chosen"
+fi
+

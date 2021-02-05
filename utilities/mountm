@@ -1,0 +1,57 @@
+#!/bin/sh
+
+help="Usage: mountm
+Mount block devices"
+
+export SUDO_ASKPASS=`which password`
+
+if [ "$1" == "-h" ]; then
+    echo "$help"
+    exit 0
+fi
+
+devices="$(lsblk -p | pcregrep -Mv 'sd.[1-9].*\n.*crypt' | grep 'part *$' | awk '{print $1,"("$4")"}' | cut -d'/' -f3)"
+if [ -z "$devices" ]; then
+    echo "error: no block devices found" 1>&2
+    exit 1
+fi
+
+chosen="$(menu 'entry.rasi' 'Mount' "$devices" | cut -d' ' -f1)"
+if [ -z "$chosen" ]; then
+    echo "error: no block devices chosen" 1>&2
+    exit 1
+fi
+
+if sudo -A blkid | grep "$chosen.*crypto_LUKS" >/dev/null; then
+    chosenName="$(menu 'entry.rasi' 'Give a name' '')"
+    if [ -z "$chosenName" ]; then
+	echo "error: no name given" 1>&2
+	exit 1
+    fi
+    termite -e "sudo cryptsetup open /dev/$chosen $chosenName"
+    chosen="/dev/mapper/$chosenName"
+else
+    chosen="/dev/$chosen"
+fi
+
+#Mount the drive if it is in fstab
+if sudo -A mount "$chosen"; then
+    notify -no-id 'Mounted' "Device $chosen" 
+    exit 0
+else
+    find=`find /mnt /run/media ~/ -maxdepth 2 -type d 2>/dev/null`
+    mountPoint="$(menu 'entry.rasi' 'Where to mount?' "$find")"
+    if [ -z "$mountPoint" ]; then
+	echo "error: no mount point given" 1>&2
+	exit 1
+    fi
+
+    if [ ! -d "$mountPoint" ] && menu -yn "Create dir?"; then
+	sudo -A mkdir -p "$mountPoint" &&
+	    notify -no-id 'New Directory' "$mountPoint"
+    fi
+
+    sudo -A mount "$chosen" "$mountPoint" &&
+	notify -no-id 'Mounted' "Device $chosen" 
+fi
+
